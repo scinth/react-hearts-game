@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import card from '../assets/card_back.png';
+import foldedCard from '../assets/card_back.png';
 
-const FoldedCard = styled.img`
+const StyledCard = styled.img`
 	width: calc(8vh + 3vw);
 	height: auto;
 	cursor: pointer;
@@ -12,8 +12,9 @@ const FoldedCard = styled.img`
 	}
 `;
 
-function Card() {
-	return <FoldedCard src={card} alt='folded card' />;
+function Card(props) {
+	let image = props.type == 'folded' ? foldedCard : props.image;
+	return <StyledCard src={image} alt={props.code} />;
 }
 
 export default Card;

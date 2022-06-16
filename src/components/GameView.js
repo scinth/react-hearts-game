@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Deck from './Deck';
 
@@ -13,13 +14,18 @@ const View = styled.div`
 `;
 
 function GameView() {
+	const northCards = useSelector(state => state.north.cards);
+	const eastCards = useSelector(state => state.east.cards);
+	const southCards = useSelector(state => state.south.cards);
+	const westCards = useSelector(state => state.west.cards);
+
 	return (
 		<View>
 			{/* Decks */}
-			<Deck player='north' />
-			<Deck player='east' />
-			<Deck player='south' />
-			<Deck player='west' />
+			<Deck player='north' cards={northCards} />
+			<Deck player='east' cards={eastCards} />
+			<Deck player='south' cards={southCards} />
+			<Deck player='west' cards={westCards} />
 			{/* Tricks */}
 		</View>
 	);

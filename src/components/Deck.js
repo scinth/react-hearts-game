@@ -10,7 +10,7 @@ const Cards = styled.div`
 	${props => props.position};
 `;
 
-function Deck({ player }) {
+function Deck({ player, cards }) {
 	let position = null;
 	switch (player) {
 		case 'north':
@@ -54,14 +54,16 @@ function Deck({ player }) {
 
 	return (
 		<Cards position={position}>
-			<Card />
-			<Card />
-			<Card />
-			<Card />
-			<Card />
-			<Card />
-			<Card />
-			<Card />
+			{cards.map(card => {
+				return (
+					<Card
+						key={card.code}
+						type={player == 'south' ? 'revealed' : 'folded'}
+						image={card.image}
+						code={card.code}
+					/>
+				);
+			})}
 		</Cards>
 	);
 }
