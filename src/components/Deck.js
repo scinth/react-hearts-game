@@ -10,7 +10,7 @@ const Cards = styled.div`
 	${props => props.position};
 `;
 
-function Deck({ player, cards }) {
+function Deck({ player, cards, selectCard }) {
 	let position = null;
 	switch (player) {
 		case 'north':
@@ -61,6 +61,7 @@ function Deck({ player, cards }) {
 						type={player == 'south' ? 'revealed' : 'folded'}
 						image={card.image}
 						code={card.code}
+						selectCard={selectCard}
 					/>
 				);
 			})}

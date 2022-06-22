@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { DECK_ID } from '../../logic/data';
+import { sortCards } from '../../logic';
 
 const initialState = {
 	loading: false,
@@ -11,7 +12,10 @@ export const fetchSouth = createAsyncThunk('south/fetchSouth', () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/South/list`;
 	return fetch(endpoint)
 		.then(res => res.json())
-		.then(data => data.piles.South.cards);
+		.then(data => {
+			let cards = data.piles.South.cards;
+			return sortCards(cards);
+		});
 });
 
 const southSlice = createSlice({

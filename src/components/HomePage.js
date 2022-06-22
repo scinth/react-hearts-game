@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { fetchDeck } from '../redux/deck/deckActions';
+import React from 'react';
 import styled from 'styled-components';
 
 const Home = styled.div`
@@ -23,37 +21,13 @@ const StartButton = styled.button`
 	border-radius: 0.5em;
 `;
 
-function HomePage({ startGame, deck, getDeck }) {
-	const [isDeckReady, setIsDeckReady] = useState(false);
-
-	useEffect(() => {
-		getDeck();
-	}, []);
-
-	useEffect(() => {
-		if (!isDeckReady && deck.cardCodes.length > 0) setIsDeckReady(true);
-	}, [deck]);
-
+function HomePage({ startGame }) {
 	return (
 		<Home>
 			<h1>~ Welcome to HEARTS! ~</h1>
-			{isDeckReady && <StartButton onClick={() => startGame()}>Start Game</StartButton>}
-
-			<p>{!isDeckReady && deck.loading ? 'Loading Deck...' : deck.error}</p>
+			<StartButton onClick={() => startGame()}>Start Game</StartButton>
 		</Home>
 	);
 }
 
-const mapStateToProps = state => {
-	return {
-		deck: state.deck,
-	};
-};
-
-const mapDispatchToProps = dispatch => {
-	return {
-		getDeck: () => dispatch(fetchDeck()),
-	};
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default HomePage;

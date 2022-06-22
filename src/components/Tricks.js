@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import styled from 'styled-components';
 import Card from './Card';
 
@@ -10,6 +9,7 @@ const Trick = styled.div`
 	height: var(--size);
 	position: absolute;
 	inset: var(--space);
+	cursor: pointer;
 	& .card.north {
 		position: inherit;
 		top: 0;
@@ -36,18 +36,19 @@ const Trick = styled.div`
 	}
 `;
 
-function Tricks({ cards, sequence }) {
+const playerNames = ['north', 'east', 'south', 'west'];
+
+function Tricks({ cards, sequence, playTrick }) {
 	return (
-		<Trick>
+		<Trick onClick={playTrick}>
 			{cards.map((card, index) => {
 				return (
 					<Card
 						key={card.code}
 						sortIndex={index}
 						type='revealed'
-						style={`card ${sequence[index]}`}
-						source={card.image}
-						click={null}
+						image={card.image}
+						className={`card ${playerNames[sequence[index]]}`}
 					/>
 				);
 			})}
@@ -55,11 +56,4 @@ function Tricks({ cards, sequence }) {
 	);
 }
 
-const mapStateToProps = state => {
-	return {
-		cards: state.trick.cards,
-		sequence: state.trick.sequence,
-	};
-};
-
-export default connect(mapStateToProps)(Tricks);
+export default Tricks;

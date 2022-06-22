@@ -12,20 +12,62 @@ export const shuffleCards = () => {
 	return shuffledCards;
 };
 
-export const distributeCards = cards => {
-	let numberOfCardsPerPlayer = 13;
-	let leadPlayerIndex = null;
-	PLAYERS.forEach((player, index) => {
-		let set = cards.splice(0, numberOfCardsPerPlayer);
-		if (leadPlayerIndex == null) {
-			set.forEach(card => {
-				if (card.name == '2' && card.suit == 'Clubs') leadPlayerIndex = index;
-			});
-		}
-		player.cards = set;
-	});
+// export const distributeCards = cards => {
+// 	let numberOfCardsPerPlayer = 13;
+// 	let leadPlayerIndex = null;
+// 	let _cards = [...cards];
+// 	PLAYERS.forEach((player, index) => {
+// 		let set = _cards.splice(0, numberOfCardsPerPlayer);
 
-	return leadPlayerIndex;
+// 		// get lead player index
+// 		if (leadPlayerIndex == null) {
+// 			set.forEach(card => {
+// 				if (card.code == '2C') leadPlayerIndex = index;
+// 			});
+// 		}
+// 	});
+
+// 	return leadPlayerIndex;
+// };
+
+export const sortCards = cards => {
+	let _cards = [...cards];
+	// sort by value
+	let values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'JACK', 'QUEEN', 'KING', 'ACE'];
+	let valuesLength = values.length;
+	let cardsLength = _cards.length;
+	let k = 0;
+	for (let i = 0; i < valuesLength; i++) {
+		let value = values[i];
+		for (let j = k; j < cardsLength; j++) {
+			let card = _cards[j];
+			if (card.value == value) {
+				let val1 = _cards[j];
+				_cards[j] = _cards[k];
+				_cards[k] = val1;
+				k++;
+			}
+		}
+	}
+	// sort by suit
+	let suits = ['CLUBS', 'DIAMONDS', 'SPADES', 'HEARTS'];
+	let suitsLength = suits.length;
+	k = 0;
+	for (let i = 0; i < suitsLength; i++) {
+		let suit = suits[i];
+		for (let j = k; j < cardsLength; j++) {
+			let card = _cards[j];
+			if (card.suit == suit) {
+				let val1 = _cards[j];
+				for (let l = j; l > k; l--) {
+					_cards[l] = _cards[l - 1];
+				}
+				_cards[k] = val1;
+				k++;
+			}
+		}
+	}
+	return _cards;
 };
 
 export const getPlaySequence = index => {
@@ -48,17 +90,17 @@ export const isValidCard = (card, status) => {
 			if (!isValid) console.log('You must play "2 of Clubs"');
 		} else {
 			if (status.hasSuit) {
-				isValid = card.suit == 'Clubs';
+				isValid = card.suit == 'CLUBS';
 				if (!isValid) console.log('You must play a "Clubs" card');
 			} else {
-				isValid = !(card.suit == 'Hearts' || card.code == 'QS');
+				isValid = !(card.suit == 'HEARS' || card.code == 'QS');
 				if (!isValid)
 					console.log('You cannot play a "Hearts" or "Queen of Spades" during the first trick');
 			}
 		}
 	} else {
 		if (status.isFirstCard) {
-			isValid = card.suit != 'Hearts' || IS_HEARTS_BROKEN;
+			isValid = card.suit != 'HEARTS' || IS_HEARTS_BROKEN;
 			if (!isValid) console.log('You cannot play a "Hearts" if it is not yet broken');
 		} else {
 			if (status.hasSuit) {

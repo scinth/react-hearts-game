@@ -1,58 +1,29 @@
 import { PLAYERS, IS_HEARTS_BROKEN, set_IS_HEARTS_BROKEN } from './data';
 import { isValidCard } from './index';
-
-export class Card {
-	constructor(name, suit) {
-		this.name = name;
-		this.suit = suit;
-		this.value = (() => {
-			if (isNaN(this.name)) {
-				switch (this.name) {
-					case 'Jack':
-						return 11;
-					case 'Queen':
-						return 12;
-					case 'King':
-						return 13;
-					case 'Ace':
-						return 14;
-				}
-			} else return Number(this.name);
-		})();
-		this.points = (() => {
-			if (this.suit == 'Hearts') return 1;
-			else if (this.name == 'Queen' && this.suit == 'Spades') return 13;
-			else return 0;
-		})();
-		this.code = (() => {
-			let nameCode = null;
-			let suitCode = null;
-			if (isNaN(this.name)) nameCode = this.name.split('')[0];
-			else nameCode = this.name;
-			suitCode = this.suit.split('')[0];
-			return `${nameCode}${suitCode}`;
-		})();
-	}
-}
+import store from '../App/store';
+import { playTrick } from './requests';
 
 export class Player {
 	constructor(name) {
 		this.name = name;
-		this.cards = null;
 		this.points = 0;
 		this.selectedCard = null;
 		this.cardsToPass = [];
 	}
+	get cards() {
+		let state = store.getState();
+		return state[this.name.toLowerCase()].cards;
+	}
 	*pass3Cards() {
 		// if user, select 3 cards using, select3Cards method
-		if (this.name == 'South(you)') yield;
+		if (this.name == 'South') yield;
 		// if computer, get 3 random cards
 		else {
 			let cards = [...this.cards];
 			while (this.cardsToPass.length < 3) {
 				let randomIndex = Math.round(Math.random() * (cards.length - 1));
 				let card = cards.splice(randomIndex, 1)[0];
-				this.cardsToPass.push(card);
+				this.cardsToPass.push(card.code);
 			}
 		}
 	}
@@ -63,6 +34,7 @@ export class Player {
 			return player.name == this.name;
 		});
 		let hasSuit = this.cards.some(card => card.suit == trick.suit);
+		let selectedCard = null;
 
 		if (ownerIndex == userIndex) {
 			let validCard = null;
@@ -94,13 +66,15 @@ export class Player {
 				}
 			}
 
-			let code = this.cards.map(card => card.code);
-			console.log(code);
+			let cardCodes = this.cards.map(card => card.code);
+			yield console.log(cardCodes);
 			do {
-				yield;
-				validCard = isValidCard(this.selectedCard, status);
+				selectedCard = this.cards.find(card => {
+					return card.code == this.selectedCard;
+				});
+				validCard = isValidCard(selectedCard, status);
 				if (!validCard) {
-					console.log('Please select a valid card');
+					yield console.log('Please select a valid card');
 				}
 			} while (!validCard);
 			// resume by selectCard method
@@ -114,13 +88,13 @@ export class Player {
 					let isValidCard = false;
 					if (trick.isFirstTrick) {
 						if (hasSuit) {
-							isValidCard = card.suit == 'Clubs';
+							isValidCard = card.suit == 'CLUBS';
 						} else {
-							isValidCard = !(cards.suit == 'Hearts' || cards.code == 'QS');
+							isValidCard = !(card.suit == 'HEARTS' || card.code == 'QS');
 						}
 					} else {
 						if (isFirstCard) {
-							isValidCard = card.suit != 'Hearts' || IS_HEARTS_BROKEN;
+							isValidCard = card.suit != 'HEARTS' || IS_HEARTS_BROKEN;
 						} else {
 							if (hasSuit) {
 								isValidCard = card.suit == trick.suit;
@@ -132,23 +106,48 @@ export class Player {
 				// console.log('Valid cards:', cards);
 				let randomIndex = Math.round(Math.random() * (cards.length - 1));
 				this.selectedCard = cards[randomIndex];
+				selectedCard = cards[randomIndex];
 			}
 		}
 
-		console.log(`\t| ${this.name} plays "${this.selectedCard.name} of ${this.selectedCard.suit}"`);
+		console.log(`\t| ${this.name} plays "${selectedCard.value} of ${selectedCard.suit}"`);
 
-		if (this.selectedCard.suit == 'Hearts' && !IS_HEARTS_BROKEN) {
+		if (selectedCard.suit == 'HEARTS' && !IS_HEARTS_BROKEN) {
 			set_IS_HEARTS_BROKEN(true);
 			console.log('Hearts is Broken!');
 		}
 
 		trick.receive({
 			ownerIndex,
-			card: this.selectedCard,
+			card: selectedCard,
 		});
+
+		playTrick(this.name, selectedCard.code);
 	}
 }
 
+const getCardPoints = card => {
+	if (card.suit == 'HEARTS') {
+		return 1;
+	} else return 0;
+};
+
+const getCardValue = card => {
+	if (isNaN(card.value)) {
+		switch (card.value) {
+			case 'JACK':
+				return 11;
+			case 'QUEEN':
+				return 12;
+			case 'KING':
+				return 13;
+			case 'ACE':
+				return 14;
+		}
+	} else return parseInt(card.value);
+};
+
+// TODO  modify trick
 export class Trick {
 	constructor(isFirstTrick) {
 		this.isFirstTrick = isFirstTrick;
@@ -164,7 +163,7 @@ export class Trick {
 	getPoints() {
 		if (this.tricks.length == 4) {
 			let points = this.tricks.reduce((total, trick) => {
-				return total + trick.card.points;
+				return total + getCardPoints(trick.card);
 			}, 0);
 			return points;
 		} else throw new Error('Tricks are not completed');
@@ -173,7 +172,7 @@ export class Trick {
 		if (this.tricks.length == 4) {
 			let winnerTrick = this.tricks.reduce((winnerTrick, trick) => {
 				let { card } = trick;
-				if (card.suit == this.suit && card.value > winnerTrick.card.value) {
+				if (card.suit == this.suit && getCardValue(card) > getCardValue(winnerTrick.card)) {
 					return trick;
 				}
 				return winnerTrick;
@@ -181,13 +180,13 @@ export class Trick {
 			return winnerTrick.ownerIndex;
 		} else throw new Error('Tricks are not completed');
 	}
-	removeCards() {
-		this.tricks.forEach(trick => {
-			let owner = PLAYERS[trick.ownerIndex];
-			let cardIndex = owner.cards.findIndex(card => card === trick.card);
-			owner.cards.splice(cardIndex, 1);
-		});
-	}
+	// removeCards() {
+	// 	this.tricks.forEach(trick => {
+	// 		let owner = PLAYERS[trick.ownerIndex];
+	// 		let cardIndex = owner.cards.findIndex(card => card === trick.card);
+	// 		owner.cards.splice(cardIndex, 1);
+	// 	});
+	// }
 }
 
 export class Leaderboard {

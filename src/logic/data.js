@@ -1,4 +1,4 @@
-import { Player, Card } from './classes';
+import { Player } from './classes';
 import { fetchNorth } from '../features/North/northSlice';
 import { fetchEast } from '../features/East/eastSlice';
 import { fetchSouth } from '../features/South/southSlice';
@@ -10,7 +10,7 @@ export let CARDS = [];
 
 // players
 export const PLAYERS = (function () {
-	let names = ['North', 'East', 'South(you)', 'West'];
+	let names = ['North', 'East', 'South', 'West'];
 	let players = names.map(name => {
 		return new Player(name);
 	});
@@ -19,8 +19,13 @@ export const PLAYERS = (function () {
 
 export let DECK_ID = localStorage.getItem('DECK_ID');
 export let GAME = null;
+export let leadPlayerIndex = null;
 export let IS_HEARTS_BROKEN = false;
 export let me = PLAYERS[2];
+
+export const setLeadPlayerIndex = value => {
+	leadPlayerIndex = value;
+};
 
 export const set_GAME = newGame => {
 	GAME = newGame;
@@ -39,8 +44,8 @@ me.select3Cards = function (codes) {
 };
 
 me.selectCard = function (code) {
-	let card = this.cards.find(card => card.code == code);
-	this.selectedCard = card;
+	this.selectedCard = code;
+	console.log('Selected card: ', code);
 	GAME.next();
 };
 
@@ -49,7 +54,7 @@ export const getCards = name => {
 	return player.cards;
 };
 
-const getPileCards = () => {
+export const getPileCards = () => {
 	store.dispatch(fetchNorth());
 	store.dispatch(fetchEast());
 	store.dispatch(fetchSouth());
@@ -63,13 +68,23 @@ const segregateCards = (pileIndex = 0) => {
 	}
 	let pileName = ['North', 'East', 'West', 'South'];
 	let sliceStart = pileIndex * 13;
-	let cards = CARDS.slice(sliceStart, sliceStart + 13).toString();
-	console.log(cards);
-	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/${pileName[pileIndex]}/add/?cards=${cards}`;
+	let cards = CARDS.slice(sliceStart, sliceStart + 13);
+	// let _2C_ = cards.find(code => code == '2C');
+	// if (_2C_) {
+	// 	leadPlayerIndex = pileIndex;
+	// }
+	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/${
+		pileName[pileIndex]
+	}/add/?cards=${cards.toString()}`;
 	fetch(endpoint)
 		.then(res => res.json())
 		.then(data => {
-			if (data.success) segregateCards(pileIndex + 1);
+			if (data.success) {
+				console.log(`Cards ${cards.toString()} segregated to ${pileName[pileIndex]}`);
+				segregateCards(pileIndex + 1);
+			} else {
+				throw new Error(`Segregation fails at ${pileName[pileIndex]}`);
+			}
 		})
 		.catch(err => {
 			console.log(`Card segregation unsuccessful: ${err}`);
@@ -80,6 +95,7 @@ export const getInitCards = function () {
 	if (DECK_ID !== null) {
 		console.log(`Deck ID: ${DECK_ID}`);
 		getPileCards();
+		// segregateCards();
 		return;
 	}
 	let endpoint = 'https://deckofcardsapi.com/api/deck/new/draw/?count=52';
