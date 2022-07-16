@@ -1,6 +1,7 @@
 import React from 'react';
 import Card from './Card';
 import styled from 'styled-components';
+import { PLAYERS } from '../logic/data';
 
 const Cards = styled.div`
 	position: absolute;
@@ -55,11 +56,16 @@ function Deck({ player, cards, selectCard }) {
 	return (
 		<Cards position={position}>
 			{cards.map(card => {
+				let style = '';
+				let _player = PLAYERS.find(_player => _player.name.toLowerCase() == player);
+				let isSelected = _player.cardsToPass.find(code => code == card.code);
+				if (isSelected) style = `${player} selected`;
 				return (
 					<Card
 						key={card.code}
 						type={player == 'south' ? 'revealed' : 'folded'}
 						image={card.image}
+						style={style}
 						code={card.code}
 						selectCard={selectCard}
 					/>

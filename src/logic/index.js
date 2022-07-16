@@ -1,34 +1,5 @@
-import { GAME, set_GAME, CARDS, PLAYERS, IS_HEARTS_BROKEN } from './data';
+import { GAME, set_GAME, IS_HEARTS_BROKEN } from './data';
 import { startGame } from './generators';
-
-export const shuffleCards = () => {
-	// shuffles cards
-	let cards = [...CARDS];
-	let shuffledCards = [];
-	do {
-		let randomIndex = Math.round(Math.random() * (cards.length - 1));
-		shuffledCards.push(cards.splice(randomIndex, 1)[0]);
-	} while (cards.length > 0);
-	return shuffledCards;
-};
-
-// export const distributeCards = cards => {
-// 	let numberOfCardsPerPlayer = 13;
-// 	let leadPlayerIndex = null;
-// 	let _cards = [...cards];
-// 	PLAYERS.forEach((player, index) => {
-// 		let set = _cards.splice(0, numberOfCardsPerPlayer);
-
-// 		// get lead player index
-// 		if (leadPlayerIndex == null) {
-// 			set.forEach(card => {
-// 				if (card.code == '2C') leadPlayerIndex = index;
-// 			});
-// 		}
-// 	});
-
-// 	return leadPlayerIndex;
-// };
 
 export const sortCards = cards => {
 	let _cards = [...cards];

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
@@ -45,9 +45,22 @@ function GameView() {
 	};
 
 	const play = () => {
+		if (selectedCards.length == 0) return;
 		me.selectCard(selectedCards[0].dataset.code);
 		setSelectedCards([]);
 	};
+
+	useEffect(() => {
+		if (
+			northCards.length == 0 &&
+			eastCards.length == 0 &&
+			southCards.length == 0 &&
+			westCards.length == 0
+		) {
+			setSelectedCards([]);
+			setSelectionLimit(3);
+		}
+	}, [northCards, eastCards, southCards, westCards]);
 
 	return (
 		<View>
@@ -59,7 +72,12 @@ function GameView() {
 			{/* Tricks */}
 			{selectionLimit == 3 && <Pass3Cards cards={selectedCards} trickMode={trickMode} />}
 			{selectionLimit == 1 && (
-				<Trick cards={trickCards} sequence={getPlaySequence(leadPlayerIndex)} playTrick={play} />
+				<Trick
+					cards={trickCards}
+					sequence={getPlaySequence(leadPlayerIndex)}
+					playTrick={play}
+					clickable={selectedCards.length > 0 ? true : false}
+				/>
 			)}
 		</View>
 	);

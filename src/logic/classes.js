@@ -51,7 +51,7 @@ export class Player {
 				if (isFirstCard) console.log('Play "2 of Clubs" to start trick');
 				else {
 					if (hasSuit) console.log('Play a "Clubs" card');
-					else console.log('Play a card except "Hearts" or "Queen of Hearts"');
+					else console.log('Play a card except "Hearts" or "Queen of Spades"');
 				}
 			} else {
 				if (isFirstCard) {
@@ -66,8 +66,8 @@ export class Player {
 				}
 			}
 
-			let cardCodes = this.cards.map(card => card.code);
-			yield console.log(cardCodes);
+			yield null;
+
 			do {
 				selectedCard = this.cards.find(card => {
 					return card.code == this.selectedCard;
@@ -82,7 +82,10 @@ export class Player {
 			// computer
 			// generate random card index
 			if (trick.isFirstTrick && isFirstCard) {
-				this.selectedCard = this.cards.find(card => card.code == '2C');
+				this.selectedCard = this.cards.find(card => {
+					return card.code === '2C';
+				});
+				selectedCard = this.selectedCard;
 			} else {
 				let cards = this.cards.filter(card => {
 					let isValidCard = false;
@@ -103,14 +106,11 @@ export class Player {
 					}
 					return isValidCard;
 				});
-				// console.log('Valid cards:', cards);
 				let randomIndex = Math.round(Math.random() * (cards.length - 1));
 				this.selectedCard = cards[randomIndex];
 				selectedCard = cards[randomIndex];
 			}
 		}
-
-		console.log(`\t| ${this.name} plays "${selectedCard.value} of ${selectedCard.suit}"`);
 
 		if (selectedCard.suit == 'HEARTS' && !IS_HEARTS_BROKEN) {
 			set_IS_HEARTS_BROKEN(true);
@@ -122,7 +122,7 @@ export class Player {
 			card: selectedCard,
 		});
 
-		playTrick(this.name, selectedCard.code);
+		yield playTrick(this.name, selectedCard.code);
 	}
 }
 
@@ -147,7 +147,6 @@ const getCardValue = card => {
 	} else return parseInt(card.value);
 };
 
-// TODO  modify trick
 export class Trick {
 	constructor(isFirstTrick) {
 		this.isFirstTrick = isFirstTrick;
@@ -180,13 +179,6 @@ export class Trick {
 			return winnerTrick.ownerIndex;
 		} else throw new Error('Tricks are not completed');
 	}
-	// removeCards() {
-	// 	this.tricks.forEach(trick => {
-	// 		let owner = PLAYERS[trick.ownerIndex];
-	// 		let cardIndex = owner.cards.findIndex(card => card === trick.card);
-	// 		owner.cards.splice(cardIndex, 1);
-	// 	});
-	// }
 }
 
 export class Leaderboard {
@@ -218,10 +210,17 @@ export class Leaderboard {
 		this.reRank();
 	}
 	display() {
+		let total = [0, 0, 0, 0];
 		console.log('\nCurrent total points:');
 		console.log('HAND\tNORTH\tEAST\tSOUTH\tWEST');
 		this.points.forEach((point, index) => {
 			console.log(`${index + 1}\t\t${point[0]}\t\t${point[1]}\t\t${point[2]}\t\t${point[3]}`);
+			total[0] += point[0];
+			total[1] += point[1];
+			total[2] += point[2];
+			total[3] += point[3];
 		});
+		console.log('-------------------------------------');
+		console.log(`TOTAL\t\t${total[0]}\t\t${total[1]}\t\t${total[2]}\t\t${total[3]}`);
 	}
 }

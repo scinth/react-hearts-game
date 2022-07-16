@@ -1,8 +1,8 @@
-import { DECK_ID, getPileCards, PLAYERS, set_IS_HEARTS_BROKEN } from './data';
+import { findLeadPlayer, PLAYERS, set_IS_HEARTS_BROKEN } from './data';
 import { Trick, Leaderboard } from './classes';
-import { shuffleCards, distributeCards, getPlaySequence } from './index';
+import { getPlaySequence } from './index';
 import { leadPlayerIndex, setLeadPlayerIndex } from './data';
-import { pass3Cards } from './requests';
+import { pass3Cards, returnTrickCards, segregateCards } from './requests';
 
 const startTrick = function* (data) {
 	let shootTheMoonPoints = 26;
@@ -12,7 +12,6 @@ const startTrick = function* (data) {
 	for (let i = 0; i < data.sequence.length; i++) {
 		let player = PLAYERS[data.sequence[i]];
 		yield* player.play(trick);
-		// TODO  south should not be called
 	}
 
 	let winnerIndex = trick.getWinnerIndex();
@@ -28,8 +27,6 @@ const startTrick = function* (data) {
 		});
 	}
 
-	// trick.removeCards();
-
 	return {
 		winnerIndex,
 		gainedPoints,
@@ -37,12 +34,6 @@ const startTrick = function* (data) {
 };
 
 const startHand = function* (data) {
-	// shuffle cards
-	// let cards = shuffleCards();
-	// console.log('\n/ deck shuffled');
-	// distribute cards
-	// let leadPlayerIndex = distributeCards(cards);
-	// console.log('/ cards distributed');
 	let trickCounter = 1;
 	let recipientCounter = data.handCounter % 4;
 	let hasCardsLeft = null;
@@ -50,36 +41,29 @@ const startHand = function* (data) {
 	let result = null;
 	set_IS_HEARTS_BROKEN(false);
 
-	for (let i = 0; i < PLAYERS.length; i++) {
-		let player = PLAYERS[i];
-		let twoOfClubs = player.cards.find(card => card.code == '2C');
-		if (twoOfClubs) {
-			setLeadPlayerIndex(i);
-			break;
-		}
-	}
+	yield segregateCards();
 
 	if (recipientCounter != 0) {
-		console.log('\nSelect 3 cards to pass:');
-		let cardCodes = PLAYERS[2].cards.map(card => card.code);
-		console.log(cardCodes);
+		yield* PLAYERS[0].pass3Cards();
+		yield* PLAYERS[1].pass3Cards();
+		yield* PLAYERS[3].pass3Cards();
 
-		for (let i = 0; i < 4; i++) {
-			let player = PLAYERS[i];
-			yield* player.pass3Cards();
-		}
+		console.log('\nSelect 3 cards to pass:');
+
+		yield* PLAYERS[2].pass3Cards();
 
 		yield pass3Cards(recipientCounter);
-		getPileCards();
+		findLeadPlayer();
 
 		console.log('\n Cards successfully passed');
+	} else {
+		findLeadPlayer();
 	}
 
 	// tricks
 	do {
-		let sequence = getPlaySequence(leadPlayerIndex);
 		let data = {
-			sequence,
+			sequence: getPlaySequence(leadPlayerIndex),
 			isFirstTrick: trickCounter == 1 ? true : false,
 		};
 
@@ -89,18 +73,18 @@ const startHand = function* (data) {
 		result = yield* startTrick(data);
 
 		console.log(`\nEnding trick#${trickCounter}`);
-		console.log(`\n${PLAYERS[result.winnerIndex].name} wins!`);
-
-		setLeadPlayerIndex(result.winnerIndex);
 
 		console.log('Current hand points:');
 		result.gainedPoints.forEach((points, index) => {
 			handPoints[index] += points;
-			console.log(`\t${PLAYERS[index].name}\t\t\t${index == 2 ? '' : '\t'}${handPoints[index]}`);
+			console.log(`\t${PLAYERS[index].name}\t\t\t${handPoints[index]}`);
 		});
 
 		hasCardsLeft = trickCounter < 13;
 		trickCounter++;
+
+		yield returnTrickCards();
+		setLeadPlayerIndex(result.winnerIndex);
 	} while (hasCardsLeft);
 
 	let isGameOver = PLAYERS.some(player => player.points >= 100);

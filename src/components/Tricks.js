@@ -9,7 +9,11 @@ const Trick = styled.div`
 	height: var(--size);
 	position: absolute;
 	inset: var(--space);
-	cursor: pointer;
+
+	&.clickable {
+		cursor: pointer;
+	}
+
 	& .card.north {
 		position: inherit;
 		top: 0;
@@ -38,20 +42,18 @@ const Trick = styled.div`
 
 const playerNames = ['north', 'east', 'south', 'west'];
 
-function Tricks({ cards, sequence, playTrick }) {
+function Tricks({ cards, sequence, playTrick, clickable }) {
 	return (
-		<Trick onClick={playTrick}>
-			{cards.map((card, index) => {
-				return (
-					<Card
-						key={card.code}
-						sortIndex={index}
-						type='revealed'
-						image={card.image}
-						className={`card ${playerNames[sequence[index]]}`}
-					/>
-				);
-			})}
+		<Trick onClick={playTrick} className={clickable ? 'clickable' : 'disabled'}>
+			{cards.map((card, index) => (
+				<Card
+					key={card.code}
+					sortIndex={index}
+					type='revealed'
+					image={card.image}
+					style={`card ${playerNames[sequence[index]]}`}
+				/>
+			))}
 		</Trick>
 	);
 }

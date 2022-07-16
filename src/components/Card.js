@@ -20,6 +20,18 @@ const RevealedCard = styled.img`
 const FoldedCard = styled.img`
 	width: calc(8vh + 3vw);
 	height: auto;
+
+	&.selected {
+		&.north {
+			margin-bottom: -90px;
+		}
+		&.east {
+			margin-left: -80px;
+		}
+		&.west {
+			margin-right: -80px;
+		}
+	}
 `;
 
 function Card(props) {
@@ -30,12 +42,13 @@ function Card(props) {
 				src={image}
 				alt={props.code}
 				data-code={props.code}
+				className={props.style}
 				onClick={e => {
 					props.selectCard(e.target);
 				}}
 			/>
 		) : (
-			<FoldedCard src={image} alt='folded card' />
+			<FoldedCard src={image} alt='folded card' className={props.style} />
 		);
 	return card;
 }
