@@ -1,7 +1,7 @@
 import { PLAYERS, IS_HEARTS_BROKEN, set_IS_HEARTS_BROKEN } from './data';
 import { isValidCard } from './index';
-import store from '../App/store';
 import { playTrick } from './requests';
+import store from '../App/store';
 
 export class Player {
 	constructor(name) {
@@ -74,7 +74,7 @@ export class Player {
 				});
 				validCard = isValidCard(selectedCard, status);
 				if (!validCard) {
-					yield console.log('Please select a valid card');
+					yield console.log('Please re-select a valid card');
 				}
 			} while (!validCard);
 			// resume by selectCard method
@@ -129,6 +129,8 @@ export class Player {
 const getCardPoints = card => {
 	if (card.suit == 'HEARTS') {
 		return 1;
+	} else if (card.code == 'QS') {
+		return 13;
 	} else return 0;
 };
 
@@ -211,7 +213,7 @@ export class Leaderboard {
 	}
 	display() {
 		let total = [0, 0, 0, 0];
-		console.log('\nCurrent total points:');
+		console.log('\nLeaderboard:');
 		console.log('HAND\tNORTH\tEAST\tSOUTH\tWEST');
 		this.points.forEach((point, index) => {
 			console.log(`${index + 1}\t\t${point[0]}\t\t${point[1]}\t\t${point[2]}\t\t${point[3]}`);
@@ -221,6 +223,9 @@ export class Leaderboard {
 			total[3] += point[3];
 		});
 		console.log('-------------------------------------');
-		console.log(`TOTAL\t\t${total[0]}\t\t${total[1]}\t\t${total[2]}\t\t${total[3]}`);
+		console.log(`TOTAL\t${total[0]}\t\t${total[1]}\t\t${total[2]}\t\t${total[3]}`);
+		console.log(
+			`RANKS\t${this.ranks[0]}\t\t${this.ranks[1]}\t\t${this.ranks[2]}\t\t${this.ranks[3]}`,
+		);
 	}
 }

@@ -4,7 +4,7 @@ import store from '../App/store';
 import Navigation from './Navigation';
 import GameView from './GameView';
 import HomePage from './HomePage';
-import { getInitCards } from '../logic/data';
+import { getInitDeck } from '../logic/data';
 import { play } from '../logic/index';
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
 	};
 
 	useEffect(() => {
-		getInitCards();
+		getInitDeck();
 	}, []);
 
 	return (

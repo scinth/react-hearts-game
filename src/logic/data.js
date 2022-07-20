@@ -79,13 +79,8 @@ export const getPileCards = (cb = null) => {
 	});
 };
 
-export const getInitCards = () => {
-	if (DECK_ID !== null) {
-		console.log(`Deck ID: ${DECK_ID}`);
-		// getPileCards();
-		return;
-	}
-	////////////////////
+export const getInitDeck = () => {
+	if (DECK_ID !== null) return;
 	let promise = getDeck();
 	promise.then(json => {
 		if (!json.success) {
@@ -93,7 +88,6 @@ export const getInitCards = () => {
 			return;
 		}
 		DECK_ID = json.deck_id;
-		// CARDS = json.cards.map(card => card.code);
 		localStorage.setItem('DECK_ID', DECK_ID);
 	});
 };

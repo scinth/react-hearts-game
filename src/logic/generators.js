@@ -18,6 +18,7 @@ const startTrick = function* (data) {
 	let points = trick.getPoints();
 
 	if (points == shootTheMoonPoints) {
+		console.log(`${PLAYERS[winnerIndex]} shoot the moon!`);
 		gainedPoints = PLAYERS.map((_, index) => {
 			return winnerIndex == index ? 0 : shootTheMoonPoints;
 		});
@@ -55,7 +56,7 @@ const startHand = function* (data) {
 		yield pass3Cards(recipientCounter);
 		findLeadPlayer();
 
-		console.log('\n Cards successfully passed');
+		console.log('\nCards successfully passed');
 	} else {
 		findLeadPlayer();
 	}
@@ -77,7 +78,7 @@ const startHand = function* (data) {
 		console.log('Current hand points:');
 		result.gainedPoints.forEach((points, index) => {
 			handPoints[index] += points;
-			console.log(`\t${PLAYERS[index].name}\t\t\t${handPoints[index]}`);
+			console.log(`  ${PLAYERS[index].name}\t\t\t${handPoints[index]}`);
 		});
 
 		hasCardsLeft = trickCounter < 13;

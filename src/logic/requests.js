@@ -73,9 +73,9 @@ export const segregateCards = async () => {
 		}
 		let cards = [...json.cards].map(card => card.code);
 
-		// INFO  adding cards to pile
-		for (let i = 0; i < 4; i++) {
-			let name = PLAYERS[i].name;
+		// adding cards to pile
+		for (const player of PLAYERS) {
+			let name = player.name;
 			let cardCodes = cards.splice(0, 13).toString();
 			response = await addCardsToPile(cardCodes, name);
 			if (!response.ok) {

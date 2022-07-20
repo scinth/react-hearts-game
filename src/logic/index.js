@@ -76,7 +76,7 @@ export const isValidCard = (card, status) => {
 		} else {
 			if (status.hasSuit) {
 				isValid = card.suit == status.suit;
-				if (!isValid) console.log(`You must play a "${status.suit}" suit`);
+				if (!isValid) console.log(`You must play a "${status.suit}" card`);
 			} else {
 				isValid = true;
 			}

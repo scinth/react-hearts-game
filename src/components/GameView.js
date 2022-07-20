@@ -20,6 +20,7 @@ const View = styled.div`
 function GameView() {
 	const [selectedCards, setSelectedCards] = useState([]);
 	const [selectionLimit, setSelectionLimit] = useState(3);
+	const [handCounter, setHandCounter] = useState(0);
 	const northCards = useSelector(state => state.north.cards);
 	const eastCards = useSelector(state => state.east.cards);
 	const southCards = useSelector(state => state.south.cards);
@@ -36,6 +37,11 @@ function GameView() {
 		} else if (selectedCards.length < selectionLimit) {
 			card.classList.add('selected');
 			setSelectedCards([...selectedCards, card]);
+		} else if (selectedCards.length == selectionLimit) {
+			let firstCard = selectedCards.shift();
+			selectedCards.push(card);
+			firstCard.classList.remove('selected');
+			card.classList.add('selected');
 		}
 	};
 
@@ -44,10 +50,11 @@ function GameView() {
 		setSelectionLimit(1);
 	};
 
-	const play = () => {
+	const play = e => {
 		if (selectedCards.length == 0) return;
 		me.selectCard(selectedCards[0].dataset.code);
 		setSelectedCards([]);
+		e.stopPropagation();
 	};
 
 	useEffect(() => {
@@ -57,8 +64,10 @@ function GameView() {
 			southCards.length == 0 &&
 			westCards.length == 0
 		) {
+			let nextHandCounter = handCounter + 1;
 			setSelectedCards([]);
-			setSelectionLimit(3);
+			setHandCounter(nextHandCounter);
+			nextHandCounter % 4 == 0 ? setSelectionLimit(1) : setSelectionLimit(3);
 		}
 	}, [northCards, eastCards, southCards, westCards]);
 
@@ -70,7 +79,9 @@ function GameView() {
 			<Deck player='south' cards={southCards} selectCard={selectCard} />
 			<Deck player='west' cards={westCards} />
 			{/* Tricks */}
-			{selectionLimit == 3 && <Pass3Cards cards={selectedCards} trickMode={trickMode} />}
+			{handCounter % 4 != 0 && selectionLimit == 3 && (
+				<Pass3Cards cards={selectedCards} trickMode={trickMode} />
+			)}
 			{selectionLimit == 1 && (
 				<Trick
 					cards={trickCards}

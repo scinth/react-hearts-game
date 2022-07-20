@@ -9,9 +9,17 @@ const Trick = styled.div`
 	height: var(--size);
 	position: absolute;
 	inset: var(--space);
+	pointer-events: none;
 
 	&.clickable {
 		cursor: pointer;
+		pointer-events: all;
+	}
+
+	& .card {
+		box-shadow: initial;
+		cursor: initial;
+		pointer-events: none;
 	}
 
 	& .card.north {
@@ -44,7 +52,7 @@ const playerNames = ['north', 'east', 'south', 'west'];
 
 function Tricks({ cards, sequence, playTrick, clickable }) {
 	return (
-		<Trick onClick={playTrick} className={clickable ? 'clickable' : 'disabled'}>
+		<Trick onClickCapture={playTrick} className={clickable ? 'clickable' : 'disabled'}>
 			{cards.map((card, index) => (
 				<Card
 					key={card.code}
