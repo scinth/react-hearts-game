@@ -11,7 +11,7 @@ const Cards = styled.div`
 	${props => props.position};
 `;
 
-function Deck({ player, cards, selectCard }) {
+function Pile({ player, cards, selectCard }) {
 	let position = null;
 	switch (player) {
 		case 'north':
@@ -25,10 +25,10 @@ function Deck({ player, cards, selectCard }) {
 			break;
 		case 'east':
 			position = `
-        inset: 150px 20px 20px auto;
+        inset: 20px 20px 20px auto;
         flex-direction: column;
         & img:not(:first-child) {
-          margin-top: -90px;
+          margin-top: calc(-9vh - 2.75vw);
         }
       `;
 			break;
@@ -47,7 +47,7 @@ function Deck({ player, cards, selectCard }) {
         inset: 20px auto 150px 20px;
         flex-direction: column;
         & img:not(:first-child) {
-          margin-top: -90px;
+          margin-top: calc(-9vh - 2.75vw);
         }
       `;
 			break;
@@ -75,4 +75,4 @@ function Deck({ player, cards, selectCard }) {
 	);
 }
 
-export default Deck;
+export default Pile;

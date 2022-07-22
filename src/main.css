@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish&family=Courgette&display=swap');
 * {
 	margin: 0;
 	padding: 0;
@@ -19,6 +20,7 @@ body {
 	min-height: 100%;
 	color: black;
 	background-color: white;
+	background: radial-gradient(darkseagreen, mediumseagreen, seagreen);
 }
 #root {
 	width: 100%;

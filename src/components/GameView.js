@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
-import Deck from './Deck';
+import Deck from './Pile';
 import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
@@ -13,7 +13,6 @@ const View = styled.div`
 	max-width: 950px;
 	margin-inline: auto;
 	height: stretch;
-	background: radial-gradient(darkseagreen, mediumseagreen, seagreen);
 	position: relative;
 `;
 
