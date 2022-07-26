@@ -6,13 +6,19 @@
 
 ### Note:
 
-This project is still in progress and is not yet responsive, if you want to play please use a desktop and open the devtools console for guidance.
+This project is still in progress and is not yet responsive, if you want to run this project please use a desktop and open the devtools console for guidance.
 
 <!-- <br />
 
 This project is deployed on Netlify
 
 [Browse Hearts Game](https://nielbrioneshearts.netlify.app) -->
+
+<br />
+
+## Acknowledgement
+
+This project is using the [Deck of Cards API](https://deckofcardsapi.com) by Chase Roberts.
 
 <br />
 
