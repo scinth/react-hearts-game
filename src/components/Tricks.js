@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Card from './Card';
 
 const Trick = styled.div`
-	--size: min(18vw, 18vh);
+	--size: 18vmin;
 	--space: calc((100% - var(--size)) / 2);
 	width: var(--size);
 	height: var(--size);

@@ -2,18 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
-import Deck from './Pile';
+import Pile from './Pile';
 import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
 
 const View = styled.div`
-	width: 80%;
-	min-width: 600px;
-	max-width: 950px;
+	width: 100%;
 	margin-inline: auto;
-	height: stretch;
 	position: relative;
+	flex-grow: 1;
+
+	@media screen and (min-aspect-ratio: 917/648) {
+		& {
+			width: 90%;
+		}
+	}
+	@media screen and (min-aspect-ratio: 1100/648) {
+		& {
+			width: 80%;
+		}
+	}
 `;
 
 function GameView() {
@@ -70,13 +79,26 @@ function GameView() {
 		}
 	}, [northCards, eastCards, southCards, westCards]);
 
+	useEffect(() => {
+		document.documentElement.style.setProperty('--numof-north-cards', `${northCards.length}`);
+	}, [northCards]);
+	useEffect(() => {
+		document.documentElement.style.setProperty('--numof-east-cards', `${eastCards.length}`);
+	}, [eastCards]);
+	useEffect(() => {
+		document.documentElement.style.setProperty('--numof-south-cards', `${southCards.length}`);
+	}, [southCards]);
+	useEffect(() => {
+		document.documentElement.style.setProperty('--numof-west-cards', `${westCards.length}`);
+	}, [westCards]);
+
 	return (
-		<View>
-			{/* Decks */}
-			<Deck player='north' cards={northCards} />
-			<Deck player='east' cards={eastCards} />
-			<Deck player='south' cards={southCards} selectCard={selectCard} />
-			<Deck player='west' cards={westCards} />
+		<View className='pile-wrapper'>
+			{/* Piles */}
+			<Pile player='north' cards={northCards} />
+			<Pile player='east' cards={eastCards} />
+			<Pile player='south' cards={southCards} selectCard={selectCard} />
+			<Pile player='west' cards={westCards} />
 			{/* Tricks */}
 			{handCounter % 4 != 0 && selectionLimit == 3 && (
 				<Pass3Cards cards={selectedCards} trickMode={trickMode} />

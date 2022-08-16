@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import foldedCard from '../assets/card_back.png';
 
 const RevealedCard = styled.img`
-	width: calc(8vh + 3vw);
-	height: auto;
 	cursor: pointer;
 	transition: margin 0.3s ease-out;
 
@@ -14,23 +12,20 @@ const RevealedCard = styled.img`
 	}
 
 	&.selected {
-		margin-top: -90px;
+		margin-top: calc(var(--card-height) / -2);
 	}
 `;
 
 const FoldedCard = styled.img`
-	width: calc(8vh + 3vw);
-	height: auto;
-
 	&.selected {
 		&.north {
-			margin-bottom: -90px;
+			margin-top: calc(var(--card-height) / 2);
 		}
 		&.east {
-			margin-left: -80px;
+			margin-left: calc(var(--card-width) / -1.6);
 		}
 		&.west {
-			margin-right: -80px;
+			margin-left: calc(var(--card-width) / 1.6);
 		}
 	}
 `;

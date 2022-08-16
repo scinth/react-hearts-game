@@ -1,4 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Mulish&family=Courgette&display=swap');
+:root {
+	--numof-north-cards: 13;
+	--numof-south-cards: 13;
+	--numof-east-cards: 13;
+	--numof-west-cards: 13;
+	--card-width: calc(5vh + 2vw);
+	--card-height: calc(var(--card-width) * 1.3861);
+	--card-wrapper-width: calc(var(--card-width) / 2);
+	--card-wrapper-height: calc(var(--card-height) / 3);
+}
 * {
 	margin: 0;
 	padding: 0;
@@ -35,4 +45,77 @@ body {
 a,
 button {
 	cursor: pointer;
+}
+/*  */
+.pile {
+	display: flex;
+	justify-content: flex-start;
+	position: absolute;
+}
+.pile-north {
+	--pile-width: calc(var(--card-wrapper-width) * (var(--numof-north-cards) + 1));
+	flex-direction: row;
+	width: var(--pile-width);
+	height: var(--card-height);
+	top: 5vmin;
+	margin: 0 calc((100% - var(--pile-width)) / 2);
+}
+.pile-south {
+	--pile-width: calc(var(--card-wrapper-width) * (var(--numof-south-cards) + 1));
+	flex-direction: row;
+	width: var(--pile-width);
+	height: var(--card-height);
+	bottom: 5vmin;
+	margin: 0 calc((100% - var(--pile-width)) / 2);
+}
+.pile-east {
+	--pile-height: calc(var(--card-wrapper-height) * (var(--numof-east-cards) + 2));
+	flex-direction: column;
+	width: var(--card-width);
+	height: var(--pile-height);
+	right: 5vmin;
+	margin-top: calc(var(--card-height) + 10vmin);
+}
+.pile-west {
+	--pile-height: calc(var(--card-wrapper-height) * (var(--numof-west-cards) + 2));
+	flex-direction: column;
+	width: var(--card-width);
+	height: var(--pile-height);
+	left: 5vmin;
+	margin-top: calc(var(--card-height) + 10vmin);
+}
+.pile-north > div,
+.pile-south > div {
+	width: var(--card-wrapper-width);
+}
+.pile-east > div,
+.pile-west > div {
+	height: var(--card-wrapper-height);
+}
+.card {
+	width: var(--card-width);
+	height: auto;
+}
+
+/* Media Queries */
+@media screen and (min-aspect-ratio: 397/653) {
+	:root {
+		--card-width: calc(5vh + 3vw);
+	}
+}
+@media screen and (min-aspect-ratio: 558/653) {
+	.pile-east,
+	.pile-west {
+		margin-top: 5vmin;
+	}
+}
+@media screen and (min-aspect-ratio: 721/653) {
+	:root {
+		--card-width: calc(6vh + 3vw);
+	}
+}
+@media screen and (min-aspect-ratio: 1100/648) {
+	:root {
+		--card-width: calc(5vh + 3vw);
+	}
 }

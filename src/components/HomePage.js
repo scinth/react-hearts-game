@@ -11,6 +11,7 @@ const Home = styled.div`
 
 	h1 {
 		font-family: 'Courgette', sans-serif;
+		text-align: center;
 		color: white;
 	}
 `;
