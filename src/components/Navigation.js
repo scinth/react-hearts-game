@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import logo from '../assets/nielbrioneshearts_logo.png';
+import Modal from './Modal';
 
 const Nav = styled.nav`
 	width: 100%;
@@ -101,34 +102,76 @@ const Nav = styled.nav`
 	}
 `;
 
+const getModalAction = type => {
+	switch (type) {
+		case 'Restart':
+			return () => alert('You are about to restart the game.');
+		case 'Quit':
+			return () => alert('You are about to quit the game.');
+		default:
+			return undefined;
+	}
+};
+
 function Navigation() {
+	const [showModal, setShowModal] = useState(false);
+	const modalType = useRef(null);
+	const closeModal = () => {
+		setShowModal(false);
+	};
 	return (
-		<Nav>
-			<div className='logo'>
-				<img className='image' src={logo} alt='Hearts logo' />
-				<span className='game-title'>Hearts</span>
-			</div>
-			<ul>
-				<li>
-					<button>
-						<i className='fa-solid fa-ranking-star' />
-						Rankings
-					</button>
-				</li>
-				<li>
-					<button>
-						<i className='fa-solid fa-rotate-left' />
-						Restart
-					</button>
-				</li>
-				<li>
-					<button>
-						<i className='fa-solid fa-heart-crack' />
-						Quit
-					</button>
-				</li>
-			</ul>
-		</Nav>
+		<>
+			<Nav>
+				<div className='logo'>
+					<img className='image' src={logo} alt='Hearts logo' />
+					<span className='game-title'>Hearts</span>
+				</div>
+				<ul>
+					<li>
+						<button
+							onClick={() => {
+								modalType.current = 'Rankings';
+								setShowModal(true);
+							}}
+						>
+							<i className='fa-solid fa-ranking-star' />
+							Rankings
+						</button>
+					</li>
+					<li>
+						<button
+							onClick={() => {
+								modalType.current = 'Restart';
+								setShowModal(true);
+							}}
+						>
+							<i className='fa-solid fa-rotate-left' />
+							Restart
+						</button>
+					</li>
+					<li>
+						<button
+							onClick={() => {
+								modalType.current = 'Quit';
+								setShowModal(true);
+							}}
+						>
+							<i className='fa-solid fa-heart-crack' />
+							Quit
+						</button>
+					</li>
+				</ul>
+			</Nav>
+			{showModal && (
+				<Modal
+					type={{
+						name: modalType.current,
+						action: getModalAction(modalType.current),
+					}}
+					close={closeModal}
+				/>
+			)}
+		</>
 	);
 }
 

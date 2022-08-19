@@ -1,7 +1,7 @@
 import { findLeadPlayer, PLAYERS, set_IS_HEARTS_BROKEN } from './data';
 import { Trick, Leaderboard } from './classes';
 import { getPlaySequence } from './index';
-import { leadPlayerIndex, setLeadPlayerIndex } from './data';
+import { leadPlayerIndex, setLeadPlayerIndex, leaderboard, set_Leaderboard } from './data';
 import { pass3Cards, returnTrickCards, segregateCards } from './requests';
 
 const startTrick = function* (data) {
@@ -100,8 +100,8 @@ export const startGame = function* () {
 	// init game data
 	let handCounter = 0;
 	let noWinner = null;
-	let leaderboard = new Leaderboard();
 	let result = null;
+	set_Leaderboard(new Leaderboard());
 
 	console.log('You play as South');
 

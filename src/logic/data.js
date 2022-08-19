@@ -6,9 +6,6 @@ import { fetchWest } from '../features/West/westSlice';
 import store from '../App/store';
 import { getDeck } from './requests';
 
-// cards
-export let CARDS = [];
-
 // players
 export const PLAYERS = (function () {
 	let names = ['North', 'East', 'South', 'West'];
@@ -23,6 +20,10 @@ export let GAME = null;
 export let leadPlayerIndex = null;
 export let IS_HEARTS_BROKEN = false;
 export let me = PLAYERS[2];
+export let leaderboard;
+export const set_Leaderboard = value => {
+	leaderboard = value;
+};
 
 export const setLeadPlayerIndex = value => {
 	leadPlayerIndex = value;

@@ -186,6 +186,7 @@ export class Trick {
 export class Leaderboard {
 	constructor() {
 		this.points = [];
+		this.total = [0, 0, 0, 0];
 		this.ranks = ['1st', '2nd', '3rd', '4th'];
 	}
 	reRank() {
@@ -210,20 +211,20 @@ export class Leaderboard {
 	update(points) {
 		this.points.push(points);
 		this.reRank();
+		points.forEach((point, index) => {
+			this.total[index] += point;
+		});
 	}
 	display() {
-		let total = [0, 0, 0, 0];
 		console.log('\nLeaderboard:');
 		console.log('HAND\tNORTH\tEAST\tSOUTH\tWEST');
 		this.points.forEach((point, index) => {
 			console.log(`${index + 1}\t\t${point[0]}\t\t${point[1]}\t\t${point[2]}\t\t${point[3]}`);
-			total[0] += point[0];
-			total[1] += point[1];
-			total[2] += point[2];
-			total[3] += point[3];
 		});
 		console.log('-------------------------------------');
-		console.log(`TOTAL\t${total[0]}\t\t${total[1]}\t\t${total[2]}\t\t${total[3]}`);
+		console.log(
+			`TOTAL\t${this.total[0]}\t\t${this.total[1]}\t\t${this.total[2]}\t\t${this.total[3]}`,
+		);
 		console.log(
 			`RANKS\t${this.ranks[0]}\t\t${this.ranks[1]}\t\t${this.ranks[2]}\t\t${this.ranks[3]}`,
 		);
