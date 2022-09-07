@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
@@ -6,6 +6,28 @@ import Pile from './Pile';
 import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
+import store from '../App/store';
+import {
+	addCard,
+	removeCard,
+	clearCards,
+	setLimit,
+	setHandCounter,
+} from '../features/Game/gameSlice';
+
+const getCardIndex = (cards, card) => {
+	let index = cards.findIndex(_card_ => {
+		return _card_.code === card.code;
+	});
+	return index;
+};
+
+const getSelectedCards = (cards, indeces) => {
+	let selectedCards = indeces.map(index => {
+		return cards[index];
+	});
+	return selectedCards;
+};
 
 const View = styled.div`
 	width: 100%;
@@ -26,42 +48,42 @@ const View = styled.div`
 `;
 
 function GameView() {
-	const [selectedCards, setSelectedCards] = useState([]);
-	const [selectionLimit, setSelectionLimit] = useState(3);
-	const [handCounter, setHandCounter] = useState(0);
+	const selectedCards = useSelector(state => state.game.selectedCards);
+	const selectionLimit = useSelector(state => state.game.selectionLimit);
+	const handCounter = useSelector(state => state.game.handCounter);
 	const northCards = useSelector(state => state.north.cards);
 	const eastCards = useSelector(state => state.east.cards);
 	const southCards = useSelector(state => state.south.cards);
 	const westCards = useSelector(state => state.west.cards);
 	const trickCards = useSelector(state => state.trick.cards);
 
-	const selectCard = card => {
-		let isSelected = selectedCards.some(_card => _card === card);
-		if (isSelected) {
-			let cardIndex = selectedCards.findIndex(_card => _card === card);
-			selectedCards.splice(cardIndex, 1);
-			card.classList.remove('selected');
-			setSelectedCards([...selectedCards]);
+	const selectCard = cardImage => {
+		let card = southCards.find(card => {
+			return card.code === cardImage.dataset.code;
+		});
+		let cardIndex = getCardIndex(southCards, card);
+		let hasSelected = selectedCards.some(index => index == cardIndex);
+		if (hasSelected) {
+			cardImage.classList.remove('selected');
+			store.dispatch(removeCard(cardIndex));
 		} else if (selectedCards.length < selectionLimit) {
-			card.classList.add('selected');
-			setSelectedCards([...selectedCards, card]);
+			cardImage.classList.add('selected');
+			store.dispatch(addCard(cardIndex));
 		} else if (selectedCards.length == selectionLimit) {
-			let firstCard = selectedCards.shift();
-			selectedCards.push(card);
-			firstCard.classList.remove('selected');
-			card.classList.add('selected');
+			console.log('Card selection complete');
 		}
 	};
 
 	const trickMode = () => {
-		setSelectedCards([]);
-		setSelectionLimit(1);
+		store.dispatch(clearCards());
+		store.dispatch(setLimit(1));
 	};
 
 	const play = e => {
 		if (selectedCards.length == 0) return;
-		me.selectCard(selectedCards[0].dataset.code);
-		setSelectedCards([]);
+		let card = southCards[selectedCards[0]];
+		me.selectCard(card.code);
+		store.dispatch(clearCards());
 		e.stopPropagation();
 	};
 
@@ -73,9 +95,9 @@ function GameView() {
 			westCards.length == 0
 		) {
 			let nextHandCounter = handCounter + 1;
-			setSelectedCards([]);
-			setHandCounter(nextHandCounter);
-			nextHandCounter % 4 == 0 ? setSelectionLimit(1) : setSelectionLimit(3);
+			store.dispatch(clearCards());
+			store.dispatch(setHandCounter(nextHandCounter));
+			nextHandCounter % 4 == 0 ? store.dispatch(setLimit(1)) : store.dispatch(setLimit(3));
 		}
 	}, [northCards, eastCards, southCards, westCards]);
 
@@ -101,7 +123,7 @@ function GameView() {
 			<Pile player='west' cards={westCards} />
 			{/* Tricks */}
 			{handCounter % 4 != 0 && selectionLimit == 3 && (
-				<Pass3Cards cards={selectedCards} trickMode={trickMode} />
+				<Pass3Cards cards={getSelectedCards(southCards, selectedCards)} trickMode={trickMode} />
 			)}
 			{selectionLimit == 1 && (
 				<Trick

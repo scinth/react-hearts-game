@@ -17,6 +17,7 @@ const ModalCard = styled.div`
 	width: 85vmin;
 	background-color: white;
 	border-radius: 1em;
+	overflow: hidden;
 
 	.table-wrapper {
 		max-height: 50vh;
@@ -47,7 +48,7 @@ const ModalCard = styled.div`
 		}
 
 		.total {
-			background-color: #77ff77aa;
+			border-top: 1px dashed #888;
 		}
 	}
 
@@ -98,24 +99,22 @@ const createModalTable = () => {
 						<th>HAND</th>
 						<th>NORTH</th>
 						<th>EAST</th>
-						<th>WEST</th>
 						<th>SOUTH</th>
+						<th>WEST</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						{leaderboard.points.map((point, index) => {
-							return (
-								<React.Fragment key={index}>
-									<td>{index}</td>
-									<td>{point[0]}</td>
-									<td>{point[1]}</td>
-									<td>{point[2]}</td>
-									<td>{point[3]}</td>
-								</React.Fragment>
-							);
-						})}
-					</tr>
+					{leaderboard.points.map((point, index) => {
+						return (
+							<tr key={index}>
+								<td>{index + 1}</td>
+								<td>{point[0]}</td>
+								<td>{point[1]}</td>
+								<td>{point[2]}</td>
+								<td>{point[3]}</td>
+							</tr>
+						);
+					})}
 					<tr className='total'>
 						<td>TOTAL</td>
 						{leaderboard.total.map((point, index) => {

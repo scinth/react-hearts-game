@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { DECK_ID, GAME } from '../../logic/data';
+import { DECK_ID } from '../../logic/data';
 
 const initialState = {
 	loading: false,
@@ -7,13 +7,14 @@ const initialState = {
 	error: '',
 };
 
-export const fetchTrick = createAsyncThunk('trick/fetchTrick', () => {
+export const fetchTrick = createAsyncThunk('trick/fetchTrick', (cb = null) => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/Trick/list`;
 	return fetch(endpoint)
 		.then(res => res.json())
 		.then(data => {
-			let cards = data.piles.Trick.cards;
-			GAME.next();
+			let cards = [];
+			if (data.piles.Trick) cards = data.piles.Trick.cards;
+			if (typeof cb == 'function') cb();
 			return cards;
 		});
 });

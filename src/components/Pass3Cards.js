@@ -34,7 +34,7 @@ function Pass3Cards({ cards, trickMode }) {
 	const enableButton = cards.length < 3 ? true : false;
 
 	const pass3Cards = () => {
-		me.cardsToPass = cards.map(card => card.dataset.code);
+		me.cardsToPass = cards.map(card => card.code);
 		GAME.next();
 		trickMode();
 	};

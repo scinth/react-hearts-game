@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import logo from '../assets/nielbrioneshearts_logo.png';
+import { returnTrickCards } from '../logic/requests';
+import { play } from '../logic';
 import Modal from './Modal';
 
 const Nav = styled.nav`
@@ -102,10 +104,14 @@ const Nav = styled.nav`
 	}
 `;
 
+const restart = () => {
+	returnTrickCards(play);
+};
+
 const getModalAction = type => {
 	switch (type) {
 		case 'Restart':
-			return () => alert('You are about to restart the game.');
+			return restart;
 		case 'Quit':
 			return () => alert('You are about to quit the game.');
 		default:

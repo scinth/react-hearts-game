@@ -86,6 +86,7 @@ export const isValidCard = (card, status) => {
 };
 
 export const play = function () {
+	console.log('Starting game...');
 	set_GAME(startGame());
 	GAME.next();
 };

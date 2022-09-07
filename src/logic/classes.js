@@ -20,6 +20,7 @@ export class Player {
 		// if computer, get 3 random cards
 		else {
 			let cards = [...this.cards];
+			this.cardsToPass = [];
 			while (this.cardsToPass.length < 3) {
 				let randomIndex = Math.round(Math.random() * (cards.length - 1));
 				let card = cards.splice(randomIndex, 1)[0];

@@ -5,6 +5,7 @@ import { fetchTrick } from '../features/Trick/tricksSlice';
 import { fetchWest } from '../features/West/westSlice';
 import { DECK_ID, GAME, getPileCards, PLAYERS } from '../logic/data';
 import store from '../App/store';
+import { setHandCounter, setLimit } from '../features/Game/gameSlice';
 
 const getNewDeck = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/new/?deck_count=1`;
@@ -142,13 +143,13 @@ export const playTrick = async (playerName, cardCode) => {
 			case 'West':
 				store.dispatch(fetchWest());
 		}
-		store.dispatch(fetchTrick());
+		store.dispatch(fetchTrick(() => GAME.next()));
 	} catch (error) {
 		console.log('playTrick failed', error);
 	}
 };
 
-export const returnTrickCards = async () => {
+export const returnTrickCards = async (cb = null) => {
 	try {
 		let response = await returnAllCardsFromTrick();
 		if (!response.ok) {
@@ -158,7 +159,18 @@ export const returnTrickCards = async () => {
 		if (!json.success) {
 			throw new Error(`returnAllCardsFromTrick failed`);
 		}
-		store.dispatch(fetchTrick());
+		if (typeof cb == 'function') {
+			// reset game
+			store.dispatch(setLimit(3));
+			store.dispatch(setHandCounter(1));
+			cb();
+			console.clear();
+		} else
+			store.dispatch(
+				fetchTrick(() => {
+					GAME.next();
+				}),
+			);
 	} catch (error) {
 		console.log('returnTrickCards failed', error);
 	}
