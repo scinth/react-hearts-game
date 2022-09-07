@@ -108,18 +108,7 @@ const restart = () => {
 	returnTrickCards(play);
 };
 
-const getModalAction = type => {
-	switch (type) {
-		case 'Restart':
-			return restart;
-		case 'Quit':
-			return () => alert('You are about to quit the game.');
-		default:
-			return undefined;
-	}
-};
-
-function Navigation() {
+function Navigation({ quit }) {
 	const [showModal, setShowModal] = useState(false);
 	const modalType = useRef(null);
 	const closeModal = () => {
@@ -172,7 +161,16 @@ function Navigation() {
 				<Modal
 					type={{
 						name: modalType.current,
-						action: getModalAction(modalType.current),
+						action: (() => {
+							switch (modalType.current) {
+								case 'Restart':
+									return restart;
+								case 'Quit':
+									return quit;
+								default:
+									return undefined;
+							}
+						})(),
 					}}
 					close={closeModal}
 				/>

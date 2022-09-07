@@ -6,6 +6,8 @@ import GameView from './GameView';
 import HomePage from './HomePage';
 import { getInitDeck } from '../logic/data';
 import { play } from '../logic/index';
+import { setLimit, setHandCounter } from '../features/Game/gameSlice';
+import { returnAllCardsToDeck } from '../logic/requests';
 
 function App() {
 	const [isGameReady, setIsGameReady] = useState(false);
@@ -15,13 +17,21 @@ function App() {
 		setIsGameReady(true);
 	};
 
+	const quitGame = () => {
+		setIsGameReady(false);
+		store.dispatch(setLimit(3));
+		store.dispatch(setHandCounter(1));
+		returnAllCardsToDeck();
+		console.clear();
+	};
+
 	useEffect(() => {
 		getInitDeck();
 	}, []);
 
 	return (
 		<Provider store={store}>
-			<Navigation />
+			<Navigation quit={quitGame} />
 			{isGameReady && <GameView />}
 			{!isGameReady && <HomePage startGame={gameOn} />}
 		</Provider>

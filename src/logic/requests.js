@@ -37,6 +37,11 @@ const returnAllCardsFromTrick = () => {
 	return fetch(endpoint);
 };
 
+const returnAllCardsFromPile = pileName => {
+	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/${pileName}/return`;
+	return fetch(endpoint);
+};
+
 //////////////////////////
 
 export const getDeck = async () => {
@@ -174,4 +179,21 @@ export const returnTrickCards = async (cb = null) => {
 	} catch (error) {
 		console.log('returnTrickCards failed', error);
 	}
+};
+
+export const returnAllCardsToDeck = () => {
+	let requests = [];
+	PLAYERS.forEach(player => {
+		requests.push(returnAllCardsFromPile(player.name));
+	});
+	requests.push(returnAllCardsFromTrick());
+	Promise.all(requests).then(responses => {
+		if (responses.every(response => response.ok)) {
+			store.dispatch(fetchNorth());
+			store.dispatch(fetchEast());
+			store.dispatch(fetchSouth());
+			store.dispatch(fetchWest());
+			store.dispatch(fetchTrick());
+		}
+	});
 };
