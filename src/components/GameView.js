@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
 import Pile from './Pile';
+import LoaderHandler from './LoaderHandler';
 import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
@@ -115,25 +116,28 @@ function GameView() {
 	}, [westCards]);
 
 	return (
-		<View className='pile-wrapper'>
-			{/* Piles */}
-			<Pile player='north' cards={northCards} />
-			<Pile player='east' cards={eastCards} />
-			<Pile player='south' cards={southCards} selectCard={selectCard} />
-			<Pile player='west' cards={westCards} />
-			{/* Tricks */}
-			{handCounter % 4 != 0 && selectionLimit == 3 && (
-				<Pass3Cards cards={getSelectedCards(southCards, selectedCards)} trickMode={trickMode} />
-			)}
-			{selectionLimit == 1 && (
-				<Trick
-					cards={trickCards}
-					sequence={getPlaySequence(leadPlayerIndex)}
-					playTrick={play}
-					clickable={selectedCards.length > 0 ? true : false}
-				/>
-			)}
-		</View>
+		<>
+			<View className='pile-wrapper'>
+				{/* Piles */}
+				<Pile player='north' cards={northCards} />
+				<Pile player='east' cards={eastCards} />
+				<Pile player='south' cards={southCards} selectCard={selectCard} />
+				<Pile player='west' cards={westCards} />
+				{/* Tricks */}
+				{handCounter % 4 != 0 && selectionLimit == 3 && (
+					<Pass3Cards cards={getSelectedCards(southCards, selectedCards)} trickMode={trickMode} />
+				)}
+				{selectionLimit == 1 && (
+					<Trick
+						cards={trickCards}
+						sequence={getPlaySequence(leadPlayerIndex)}
+						playTrick={play}
+						clickable={selectedCards.length > 0 ? true : false}
+					/>
+				)}
+			</View>
+			<LoaderHandler />
+		</>
 	);
 }
 

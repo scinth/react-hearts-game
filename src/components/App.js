@@ -31,7 +31,7 @@ function App() {
 
 	return (
 		<Provider store={store}>
-			<Navigation quit={quitGame} />
+			<Navigation isGameReady={isGameReady} quit={quitGame} />
 			{isGameReady && <GameView />}
 			{!isGameReady && <HomePage startGame={gameOn} />}
 		</Provider>

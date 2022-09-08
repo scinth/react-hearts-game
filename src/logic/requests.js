@@ -5,7 +5,7 @@ import { fetchTrick } from '../features/Trick/tricksSlice';
 import { fetchWest } from '../features/West/westSlice';
 import { DECK_ID, GAME, getPileCards, PLAYERS } from '../logic/data';
 import store from '../App/store';
-import { setHandCounter, setLimit } from '../features/Game/gameSlice';
+import { setHandCounter, setLimit, setStatus } from '../features/Game/gameSlice';
 
 const getNewDeck = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/new/?deck_count=1`;
@@ -46,6 +46,7 @@ const returnAllCardsFromPile = pileName => {
 
 export const getDeck = async () => {
 	try {
+		store.dispatch(setStatus(0));
 		let response = await getNewDeck();
 		if (!response.ok) {
 			throw new Error(`HTTP error: ${response.status}`);
@@ -60,6 +61,7 @@ export const getDeck = async () => {
 export const segregateCards = async () => {
 	try {
 		let response, json;
+		store.dispatch(setStatus(1));
 		response = await shuffleDeck();
 		if (!response.ok) {
 			throw new Error(`HTTP error: ${response.status}`);
@@ -69,6 +71,7 @@ export const segregateCards = async () => {
 			throw new Error('shuffleDeck failed');
 		}
 		console.log('Deck shuffled');
+		store.dispatch(setStatus(2));
 		response = await drawAllCardsFromDeck();
 		if (!response.ok) {
 			throw new Error(`HTTP error: ${response.status}`);
@@ -104,6 +107,7 @@ export const segregateCards = async () => {
 
 export const pass3Cards = async recipientCounter => {
 	try {
+		store.dispatch(setStatus(3));
 		for (let index = 0; index < 4; index++) {
 			let recipientIndex = index + recipientCounter;
 			while (recipientIndex >= 4) recipientIndex -= 4;

@@ -4,6 +4,7 @@ const initialState = {
 	selectedCards: [],
 	selectionLimit: 3,
 	handCounter: 0,
+	status: null,
 };
 
 const gameSlice = createSlice({
@@ -25,6 +26,9 @@ const gameSlice = createSlice({
 		},
 		setHandCounter: (state, action) => {
 			state.handCounter = action.payload;
+		},
+		setStatus: (state, action) => {
+			state.status = action.payload;
 		},
 	},
 });
@@ -56,6 +60,12 @@ export const setLimit = value => {
 export const setHandCounter = value => {
 	return {
 		type: 'game/setHandCounter',
+		payload: value,
+	};
+};
+export const setStatus = value => {
+	return {
+		type: 'game/setStatus',
 		payload: value,
 	};
 };

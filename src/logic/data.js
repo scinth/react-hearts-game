@@ -4,6 +4,7 @@ import { fetchEast } from '../features/East/eastSlice';
 import { fetchSouth } from '../features/South/southSlice';
 import { fetchWest } from '../features/West/westSlice';
 import { fetchTrick } from '../features/Trick/tricksSlice';
+import { setStatus } from '../features/Game/gameSlice';
 import store from '../App/store';
 import { getDeck } from './requests';
 
@@ -74,10 +75,10 @@ export const getPileCards = (cb = null) => {
 	let fetch_south = store.dispatch(fetchSouth());
 	let fetch_west = store.dispatch(fetchWest());
 	let fetch_trick = store.dispatch(fetchTrick());
-	if (typeof cb !== 'function') return;
 	Promise.all([fetch_north, fetch_east, fetch_south, fetch_west, fetch_trick]).then(responses => {
 		if (responses.every(res => res.meta.requestStatus === 'fulfilled')) {
-			cb();
+			store.dispatch(setStatus(4));
+			if (typeof cb === 'function') cb();
 		}
 	});
 };

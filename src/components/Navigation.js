@@ -59,9 +59,14 @@ const Nav = styled.nav`
 				margin: 1.2em 0.6em;
 				box-shadow: 0 2px 4px -1px rgb(0, 0, 0, 0.3);
 
-				&:hover {
+				&:not(:disabled):hover {
 					transform: scale(1.05);
 					transition: transform 0.18s ease;
+				}
+
+				&:disabled {
+					opacity: 0.5;
+					cursor: not-allowed;
 				}
 			}
 
@@ -108,7 +113,7 @@ const restart = () => {
 	returnTrickCards(play);
 };
 
-function Navigation({ quit }) {
+function Navigation({ isGameReady, quit }) {
 	const [showModal, setShowModal] = useState(false);
 	const modalType = useRef(null);
 	const closeModal = () => {
@@ -124,6 +129,7 @@ function Navigation({ quit }) {
 				<ul>
 					<li>
 						<button
+							disabled={!isGameReady}
 							onClick={() => {
 								modalType.current = 'Rankings';
 								setShowModal(true);
@@ -135,6 +141,7 @@ function Navigation({ quit }) {
 					</li>
 					<li>
 						<button
+							disabled={!isGameReady}
 							onClick={() => {
 								modalType.current = 'Restart';
 								setShowModal(true);
@@ -146,6 +153,7 @@ function Navigation({ quit }) {
 					</li>
 					<li>
 						<button
+							disabled={!isGameReady}
 							onClick={() => {
 								modalType.current = 'Quit';
 								setShowModal(true);
