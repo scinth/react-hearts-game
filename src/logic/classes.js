@@ -2,6 +2,7 @@ import { PLAYERS, IS_HEARTS_BROKEN, set_IS_HEARTS_BROKEN } from './data';
 import { isValidCard } from './index';
 import { playTrick } from './requests';
 import store from '../App/store';
+import { setNotif } from '../features/Game/gameSlice';
 
 export class Player {
 	constructor(name) {
@@ -49,20 +50,34 @@ export class Player {
 			// allow user to select a card
 			console.log('\nYour turn...');
 			if (trick.isFirstTrick) {
-				if (isFirstCard) console.log('Play "2 of Clubs" to start trick');
-				else {
-					if (hasSuit) console.log('Play a "Clubs" card');
-					else console.log('Play a card except "Hearts" or "Queen of Spades"');
+				if (isFirstCard) {
+					console.log('Play "2 of Clubs" to start trick');
+					store.dispatch(setNotif('Play "2 of Clubs" to start trick'));
+				} else {
+					if (hasSuit) {
+						console.log('Play a "Clubs" card');
+						store.dispatch(setNotif('Play a "Clubs" card'));
+					} else {
+						console.log('Play a card except "Hearts" or "Queen of Spades"');
+						store.dispatch(setNotif('Play a card except "Hearts" or "Queen of Spades"'));
+					}
 				}
 			} else {
 				if (isFirstCard) {
-					if (IS_HEARTS_BROKEN) console.log('Play a card to start trick');
-					else console.log('Play a card except "Hearts" to start trick');
+					if (IS_HEARTS_BROKEN) {
+						console.log('Play a card to start trick');
+						store.dispatch(setNotif('Play a card to start trick'));
+					} else {
+						console.log('Play a card except "Hearts" to start trick');
+						store.dispatch(setNotif('Play a card except "Hearts" to start trick'));
+					}
 				} else {
 					if (hasSuit) {
 						console.log(`Play a "${trick.suit}" card`);
+						store.dispatch(setNotif(`Play a "${trick.suit}" card`));
 					} else {
 						console.log('Play any card');
+						store.dispatch(setNotif('Play any card'));
 					}
 				}
 			}
@@ -78,6 +93,7 @@ export class Player {
 					yield console.log('Please re-select a valid card');
 				}
 			} while (!validCard);
+			store.dispatch(setNotif(''));
 			// resume by selectCard method
 		} else {
 			// computer
@@ -116,6 +132,7 @@ export class Player {
 		if (selectedCard.suit == 'HEARTS' && !IS_HEARTS_BROKEN) {
 			set_IS_HEARTS_BROKEN(true);
 			console.log('Hearts is Broken!');
+			store.dispatch(setNotif('Hearts is Broken!'));
 		}
 
 		trick.receive({

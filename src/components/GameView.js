@@ -8,6 +8,7 @@ import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
 import store from '../App/store';
+import Notifier from './Notifier';
 import {
 	addCard,
 	removeCard,
@@ -136,6 +137,7 @@ function GameView() {
 					/>
 				)}
 			</View>
+			<Notifier />
 			<LoaderHandler />
 		</>
 	);

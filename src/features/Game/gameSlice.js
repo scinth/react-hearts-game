@@ -5,6 +5,7 @@ const initialState = {
 	selectionLimit: 3,
 	handCounter: 0,
 	status: null,
+	notif: '',
 };
 
 const gameSlice = createSlice({
@@ -29,6 +30,9 @@ const gameSlice = createSlice({
 		},
 		setStatus: (state, action) => {
 			state.status = action.payload;
+		},
+		setNotif: (state, action) => {
+			state.notif = action.payload;
 		},
 	},
 });
@@ -66,6 +70,12 @@ export const setHandCounter = value => {
 export const setStatus = value => {
 	return {
 		type: 'game/setStatus',
+		payload: value,
+	};
+};
+export const setNotif = value => {
+	return {
+		type: 'game/setNotif',
 		payload: value,
 	};
 };

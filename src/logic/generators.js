@@ -1,8 +1,17 @@
-import { findLeadPlayer, PLAYERS, set_IS_HEARTS_BROKEN } from './data';
+import {
+	findLeadPlayer,
+	PLAYERS,
+	set_IS_HEARTS_BROKEN,
+	leadPlayerIndex,
+	setLeadPlayerIndex,
+	leaderboard,
+	set_Leaderboard,
+} from './data';
 import { Trick, Leaderboard } from './classes';
 import { getPlaySequence } from './index';
-import { leadPlayerIndex, setLeadPlayerIndex, leaderboard, set_Leaderboard } from './data';
 import { pass3Cards, returnTrickCards, segregateCards } from './requests';
+import store from '../App/store';
+import { setNotif } from '../features/Game/gameSlice';
 
 const startTrick = function* (data) {
 	let shootTheMoonPoints = 26;
@@ -19,6 +28,7 @@ const startTrick = function* (data) {
 
 	if (points == shootTheMoonPoints) {
 		console.log(`${PLAYERS[winnerIndex]} shoot the moon!`);
+		store.dispatch(setNotif(`${PLAYERS[winnerIndex]} shoot the moon!`));
 		gainedPoints = PLAYERS.map((_, index) => {
 			return winnerIndex == index ? 0 : shootTheMoonPoints;
 		});
@@ -49,7 +59,9 @@ const startHand = function* (data) {
 		yield* PLAYERS[1].pass3Cards();
 		yield* PLAYERS[3].pass3Cards();
 
-		console.log('\nSelect 3 cards to pass:');
+		let recipients = ['West', 'North', 'East'];
+		console.log(`\nPass 3 cards to ${recipients[recipientCounter - 1]}:`);
+		store.dispatch(setNotif(`Pass 3 cards to ${recipients[recipientCounter - 1]}`));
 
 		yield* PLAYERS[2].pass3Cards();
 

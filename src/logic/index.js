@@ -1,5 +1,7 @@
 import { GAME, set_GAME, IS_HEARTS_BROKEN } from './data';
 import { startGame } from './generators';
+import { setNotif } from '../features/Game/gameSlice';
+import store from '../App/store';
 
 export const sortCards = cards => {
 	let _cards = [...cards];
@@ -58,25 +60,41 @@ export const isValidCard = (card, status) => {
 	if (status.isFirstTrick) {
 		if (status.isFirstCard) {
 			isValid = card.code == '2C';
-			if (!isValid) console.log('You must play "2 of Clubs"');
+			if (!isValid) {
+				console.log('You must play "2 of Clubs"');
+				store.dispatch(setNotif('You must play "2 of Clubs"'));
+			}
 		} else {
 			if (status.hasSuit) {
 				isValid = card.suit == 'CLUBS';
-				if (!isValid) console.log('You must play a "Clubs" card');
+				if (!isValid) {
+					console.log('You must play a "Clubs" card');
+					store.dispatch(setNotif('You must play a "Clubs" card'));
+				}
 			} else {
 				isValid = !(card.suit == 'HEARS' || card.code == 'QS');
-				if (!isValid)
+				if (!isValid) {
 					console.log('You cannot play a "Hearts" or "Queen of Spades" during the first trick');
+					store.dispatch(
+						setNotif('You cannot play a "Hearts" or "Queen of Spades" during the first trick'),
+					);
+				}
 			}
 		}
 	} else {
 		if (status.isFirstCard) {
 			isValid = card.suit != 'HEARTS' || IS_HEARTS_BROKEN;
-			if (!isValid) console.log('You cannot play a "Hearts" if it is not yet broken');
+			if (!isValid) {
+				console.log('"Hearts" cannot be played until it is broken');
+				store.dispatch(setNotif('"Hearts" cannot be played until it is broken'));
+			}
 		} else {
 			if (status.hasSuit) {
 				isValid = card.suit == status.suit;
-				if (!isValid) console.log(`You must play a "${status.suit}" card`);
+				if (!isValid) {
+					console.log(`You must play a "${status.suit}" card`);
+					store.dispatch(setNotif(`You must play a "${status.suit}" card`));
+				}
 			} else {
 				isValid = true;
 			}
