@@ -1,9 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import logo from '../assets/nielbrioneshearts_logo.png';
 import { returnTrickCards } from '../logic/requests';
 import { play } from '../logic';
 import Modal from './Modal';
+import { GAME } from '../logic/data';
+import { useSelector } from 'react-redux';
+import store from '../App/store';
+import { closeModal, showModal } from '../features/Modal/modalSlice';
 
 const Nav = styled.nav`
 	width: 100%;
@@ -114,10 +118,10 @@ const restart = () => {
 };
 
 function Navigation({ isGameReady, quit }) {
-	const [showModal, setShowModal] = useState(false);
-	const modalType = useRef(null);
-	const closeModal = () => {
-		setShowModal(false);
+	const { open, type, paused } = useSelector(state => state.modal);
+	const close = () => {
+		if (paused) GAME.next();
+		store.dispatch(closeModal());
 	};
 	return (
 		<>
@@ -131,8 +135,7 @@ function Navigation({ isGameReady, quit }) {
 						<button
 							disabled={!isGameReady}
 							onClick={() => {
-								modalType.current = 'Rankings';
-								setShowModal(true);
+								store.dispatch(showModal({ type: 'Rankings', paused: false }));
 							}}
 						>
 							<i className='fa-solid fa-ranking-star' />
@@ -143,8 +146,7 @@ function Navigation({ isGameReady, quit }) {
 						<button
 							disabled={!isGameReady}
 							onClick={() => {
-								modalType.current = 'Restart';
-								setShowModal(true);
+								store.dispatch(showModal({ type: 'Restart', paused: false }));
 							}}
 						>
 							<i className='fa-solid fa-rotate-left' />
@@ -155,8 +157,7 @@ function Navigation({ isGameReady, quit }) {
 						<button
 							disabled={!isGameReady}
 							onClick={() => {
-								modalType.current = 'Quit';
-								setShowModal(true);
+								store.dispatch(showModal({ type: 'Quit', paused: false }));
 							}}
 						>
 							<i className='fa-solid fa-heart-crack' />
@@ -165,12 +166,12 @@ function Navigation({ isGameReady, quit }) {
 					</li>
 				</ul>
 			</Nav>
-			{showModal && (
+			{open && (
 				<Modal
 					type={{
-						name: modalType.current,
+						name: type,
 						action: (() => {
-							switch (modalType.current) {
+							switch (type) {
 								case 'Restart':
 									return restart;
 								case 'Quit':
@@ -180,7 +181,7 @@ function Navigation({ isGameReady, quit }) {
 							}
 						})(),
 					}}
-					close={closeModal}
+					close={close}
 				/>
 			)}
 		</>

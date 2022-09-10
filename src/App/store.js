@@ -5,6 +5,7 @@ import southReducer from '../features/South/southSlice';
 import westReducer from '../features/West/westSlice';
 import trickReducer from '../features/Trick/tricksSlice';
 import gameReducer from '../features/Game/gameSlice';
+import modalReducer from '../features/Modal/modalSlice';
 
 const store = configureStore({
 	reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
 		west: westReducer,
 		trick: trickReducer,
 		game: gameReducer,
+		modal: modalReducer,
 	},
 });
 

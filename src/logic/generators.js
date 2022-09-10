@@ -12,6 +12,7 @@ import { getPlaySequence } from './index';
 import { pass3Cards, returnTrickCards, segregateCards } from './requests';
 import store from '../App/store';
 import { setNotif } from '../features/Game/gameSlice';
+import { showModal } from '../features/Modal/modalSlice';
 
 const startTrick = function* (data) {
 	let shootTheMoonPoints = 26;
@@ -140,6 +141,7 @@ export const startGame = function* () {
 		leaderboard.display();
 
 		noWinner = !isGameOver;
+		yield store.dispatch(showModal({ type: 'Rankings', paused: true }));
 	} while (noWinner);
 
 	console.log('\n#####################################');
