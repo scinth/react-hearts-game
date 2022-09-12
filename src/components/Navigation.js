@@ -117,7 +117,7 @@ const restart = () => {
 	returnTrickCards(play);
 };
 
-function Navigation({ isGameReady, quit }) {
+function Navigation({ isGameReady, quitGame }) {
 	const { open, type, paused } = useSelector(state => state.modal);
 	const close = () => {
 		if (paused) GAME.next();
@@ -175,7 +175,7 @@ function Navigation({ isGameReady, quit }) {
 								case 'Restart':
 									return restart;
 								case 'Quit':
-									return quit;
+									return quitGame;
 								default:
 									return undefined;
 							}

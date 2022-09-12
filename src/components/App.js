@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import React, { useEffect } from 'react';
 import store from '../App/store';
 import Navigation from './Navigation';
 import GameView from './GameView';
 import HomePage from './HomePage';
 import { getInitDeck } from '../logic/data';
 import { play } from '../logic/index';
-import { setLimit, setHandCounter } from '../features/Game/gameSlice';
+import { setLimit, setHandCounter, setGameOver } from '../features/Game/gameSlice';
 import { returnAllCardsToDeck } from '../logic/requests';
+import { useSelector } from 'react-redux';
+import GameOver from './GameOver';
 
 function App() {
-	const [isGameReady, setIsGameReady] = useState(false);
+	const { isOver, winner } = useSelector(state => state.game.gameOver);
 
-	const gameOn = () => {
+	const startGame = () => {
 		play();
-		setIsGameReady(true);
+		store.dispatch(setGameOver({ isOver: false, winner: '' }));
 	};
 
-	const quitGame = () => {
-		setIsGameReady(false);
+	const endGame = () => {
+		store.dispatch(setGameOver({ isOver: true, winner: '' }));
 		store.dispatch(setLimit(3));
 		store.dispatch(setHandCounter(1));
 		returnAllCardsToDeck();
@@ -30,11 +31,12 @@ function App() {
 	}, []);
 
 	return (
-		<Provider store={store}>
-			<Navigation isGameReady={isGameReady} quit={quitGame} />
-			{isGameReady && <GameView />}
-			{!isGameReady && <HomePage startGame={gameOn} />}
-		</Provider>
+		<>
+			<Navigation isGameReady={!isOver} quitGame={endGame} />
+			{!isOver && <GameView />}
+			{isOver && winner == '' && <HomePage startGame={startGame} />}
+			{isOver && winner != '' && <GameOver winner={winner} close={endGame} />}
+		</>
 	);
 }
 

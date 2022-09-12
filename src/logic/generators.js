@@ -11,7 +11,7 @@ import { Trick, Leaderboard } from './classes';
 import { getPlaySequence } from './index';
 import { pass3Cards, returnTrickCards, segregateCards } from './requests';
 import store from '../App/store';
-import { setNotif } from '../features/Game/gameSlice';
+import { setNotif, setGameOver } from '../features/Game/gameSlice';
 import { showModal } from '../features/Modal/modalSlice';
 
 const startTrick = function* (data) {
@@ -101,19 +101,13 @@ const startHand = function* (data) {
 		setLeadPlayerIndex(result.winnerIndex);
 	} while (hasCardsLeft);
 
-	let isGameOver = PLAYERS.some(player => player.points >= 100);
-
-	return {
-		isGameOver,
-		handPoints,
-	};
+	return handPoints;
 };
 
 export const startGame = function* () {
 	// init game data
 	let handCounter = 0;
-	let noWinner = null;
-	let result = null;
+	let isGameOver = null;
 	set_Leaderboard(new Leaderboard());
 
 	console.log('You play as South');
@@ -127,11 +121,9 @@ export const startGame = function* () {
 		console.log('\n#####################################');
 		console.log(`\nStarting hand#${handCounter}`);
 
-		result = yield* startHand(data);
+		let handPoints = yield* startHand(data);
 
 		console.log(`\nEnding hand#${handCounter}`);
-
-		let { isGameOver, handPoints } = result;
 
 		PLAYERS.forEach((player, index) => {
 			player.points += handPoints[index];
@@ -140,9 +132,10 @@ export const startGame = function* () {
 		leaderboard.update(handPoints);
 		leaderboard.display();
 
-		noWinner = !isGameOver;
+		isGameOver = PLAYERS.some(player => player.points >= 100);
+
 		yield store.dispatch(showModal({ type: 'Rankings', paused: true }));
-	} while (noWinner);
+	} while (!isGameOver);
 
 	console.log('\n#####################################');
 	console.log('\n~ GAME OVER ~');
@@ -152,4 +145,5 @@ export const startGame = function* () {
 	});
 	console.log(`\n${winner.name} wins!`);
 	leaderboard.display();
+	store.dispatch(setGameOver({ isOver: true, winner: winner.name }));
 };

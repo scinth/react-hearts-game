@@ -31,6 +31,10 @@ const ModalCard = styled.div`
 		border-collapse: collapse;
 		overflow: hidden;
 
+		tbody tr:not(.status):nth-child(odd) {
+			background-color: #f0f0f0;
+		}
+
 		th {
 			color: tomato;
 			padding: 1em;
@@ -116,13 +120,13 @@ const createModalTable = () => {
 							</tr>
 						);
 					})}
-					<tr className='total'>
+					<tr className='status total'>
 						<td>TOTAL</td>
 						{leaderboard.total.map((point, index) => {
 							return <td key={index}>{point}</td>;
 						})}
 					</tr>
-					<tr>
+					<tr className='status ranks'>
 						<td>RANKS</td>
 						{leaderboard.ranks.map((rank, index) => {
 							return <td key={index}>{rank}</td>;
