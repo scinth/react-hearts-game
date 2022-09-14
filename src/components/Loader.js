@@ -13,8 +13,9 @@ const Wrapper = styled.div`
 
 	p {
 		font-family: 'Courgette', cursive;
-		font-size: 3rem;
+		font-size: var(--card-width);
 		font-weight: bold;
+		text-align: center;
 		color: #ccc;
 	}
 `;

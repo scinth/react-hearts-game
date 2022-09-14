@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Home = styled.div`
+	font-size: var(--card-width);
 	width: 100%;
-	height: stretch;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -11,14 +12,16 @@ const Home = styled.div`
 
 	h1 {
 		font-family: 'Courgette', sans-serif;
+		font-size: 0.9em;
 		text-align: center;
 		color: white;
 	}
 `;
 
 const StartButton = styled.button`
-	font-family: 'Malish', sans-serif;
-	font-size: 1.2rem;
+	font-family: 'Mulish', sans-serif;
+	font-size: 0.35em;
+	text-transform: uppercase;
 	margin: 2rem;
 	padding: 1em 2em;
 	color: white;
@@ -30,8 +33,8 @@ const StartButton = styled.button`
 function HomePage({ startGame }) {
 	return (
 		<Home>
-			<h1>Welcome to HEARTS!</h1>
-			<StartButton onClick={() => startGame()}>Start Game</StartButton>
+			<h1>Welcome to Hearts!</h1>
+			<StartButton onClick={() => startGame()}>start</StartButton>
 		</Home>
 	);
 }

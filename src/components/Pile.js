@@ -2,14 +2,14 @@ import React from 'react';
 import Card from './Card';
 import { PLAYERS } from '../logic/data';
 
-function Pile({ player, cards, selectCard }) {
+function Pile({ player, cards, selected, selectCard }) {
+	let _player = PLAYERS.find(_player => _player.name.toLowerCase() == player);
 	return (
 		<div className={`pile pile-${player}`}>
-			{cards.map(card => {
+			{cards.map((card, index) => {
 				let style = 'card ';
-				let _player = PLAYERS.find(_player => _player.name.toLowerCase() == player);
 				let isSelected = _player.cardsToPass.find(code => code == card.code);
-				if (isSelected) style += `${player} selected`;
+				if (isSelected || selected?.includes(index)) style += `${player} selected`;
 				return (
 					<div key={card.code}>
 						<Card

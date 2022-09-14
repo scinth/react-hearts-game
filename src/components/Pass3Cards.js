@@ -15,6 +15,7 @@ const PassSection = styled.div`
 `;
 
 const PassButton = styled.button`
+	font-family: 'Mulish', sans-serif;
 	font-weight: bold;
 	color: #555;
 	background-color: #dcdcdc;

@@ -2,7 +2,8 @@ import { PLAYERS, IS_HEARTS_BROKEN, set_IS_HEARTS_BROKEN } from './data';
 import { isValidCard } from './index';
 import { playTrick } from './requests';
 import store from '../App/store';
-import { setNotif } from '../features/Game/gameSlice';
+import { clearCards, setNotif } from '../features/Game/gameSlice';
+import { capitalize } from '.';
 
 export class Player {
 	constructor(name) {
@@ -74,7 +75,7 @@ export class Player {
 				} else {
 					if (hasSuit) {
 						console.log(`Play a "${trick.suit}" card`);
-						store.dispatch(setNotif(`Play a "${trick.suit}" card`));
+						store.dispatch(setNotif(`Play a "${capitalize(trick.suit)}" card`));
 					} else {
 						console.log('Play any card');
 						store.dispatch(setNotif('Play any card'));
@@ -90,6 +91,7 @@ export class Player {
 				});
 				validCard = isValidCard(selectedCard, status);
 				if (!validCard) {
+					store.dispatch(clearCards());
 					yield console.log('Please re-select a valid card');
 				}
 			} while (!validCard);
@@ -141,6 +143,7 @@ export class Player {
 		});
 
 		yield playTrick(this.name, selectedCard.code);
+		if (ownerIndex == userIndex) store.dispatch(clearCards());
 	}
 }
 

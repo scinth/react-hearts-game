@@ -66,10 +66,8 @@ function GameView() {
 		let cardIndex = getCardIndex(southCards, card);
 		let hasSelected = selectedCards.some(index => index == cardIndex);
 		if (hasSelected) {
-			cardImage.classList.remove('selected');
 			store.dispatch(removeCard(cardIndex));
 		} else if (selectedCards.length < selectionLimit) {
-			cardImage.classList.add('selected');
 			store.dispatch(addCard(cardIndex));
 		} else if (selectedCards.length == selectionLimit) {
 			console.log('Card selection complete');
@@ -85,7 +83,6 @@ function GameView() {
 		if (selectedCards.length == 0) return;
 		let card = southCards[selectedCards[0]];
 		me.selectCard(card.code);
-		store.dispatch(clearCards());
 		e.stopPropagation();
 	};
 
@@ -122,7 +119,7 @@ function GameView() {
 				{/* Piles */}
 				<Pile player='north' cards={northCards} />
 				<Pile player='east' cards={eastCards} />
-				<Pile player='south' cards={southCards} selectCard={selectCard} />
+				<Pile player='south' cards={southCards} selected={selectedCards} selectCard={selectCard} />
 				<Pile player='west' cards={westCards} />
 				{/* Tricks */}
 				{handCounter % 4 != 0 && selectionLimit == 3 && (

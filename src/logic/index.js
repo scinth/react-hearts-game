@@ -3,6 +3,13 @@ import { startGame } from './generators';
 import { setNotif } from '../features/Game/gameSlice';
 import store from '../App/store';
 
+export const capitalize = string => {
+	let lowCase = string.toLowerCase();
+	let splitted = lowCase.split('');
+	splitted[0] = splitted[0].toUpperCase();
+	return splitted.join('');
+};
+
 export const sortCards = cards => {
 	let _cards = [...cards];
 	// sort by value
@@ -93,7 +100,7 @@ export const isValidCard = (card, status) => {
 				isValid = card.suit == status.suit;
 				if (!isValid) {
 					console.log(`You must play a "${status.suit}" card`);
-					store.dispatch(setNotif(`You must play a "${status.suit}" card`));
+					store.dispatch(setNotif(`You must play a "${capitalize(status.suit)}" card`));
 				}
 			} else {
 				isValid = true;

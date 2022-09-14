@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
+	font-size: var(--card-width);
 	width: 100%;
 	height: 100%;
 	display: flex;
@@ -11,18 +12,18 @@ const Wrapper = styled.div`
 
 	h1 {
 		font-family: 'Courgette', cursive;
-		font-size: 4em;
+		font-size: 0.9em;
 		text-align: center;
 		color: ${props => props.color};
-		padding-bottom: 0.5em;
 	}
 
 	button {
 		font-family: 'Mulish', sans-serif;
-		font-size: 1.5em;
+		font-size: 0.35em;
 		font-weight: bold;
 		text-transform: uppercase;
-		padding: 0.8em 1.5em;
+		margin: 2rem;
+		padding: 1em 2em;
 		background-color: ${props => props.color};
 		color: white;
 		border: none;

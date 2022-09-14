@@ -140,9 +140,9 @@ export const startGame = function* () {
 	console.log('\n#####################################');
 	console.log('\n~ GAME OVER ~');
 
-	let winner = PLAYERS.reduce((winner, player) => {
-		return player.points < winner.points ? player : winner;
-	});
+	let winnerIndex = leaderboard.ranks.indexOf('1st');
+	let winner = PLAYERS[winnerIndex];
+
 	console.log(`\n${winner.name} wins!`);
 	leaderboard.display();
 	store.dispatch(setGameOver({ isOver: true, winner: winner.name }));
