@@ -4,7 +4,6 @@ import foldedCard from '../assets/card_back.png';
 
 const RevealedCard = styled.img`
 	cursor: pointer;
-	transition: margin 0.3s ease-out;
 
 	&.selected,
 	&:hover {

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import { v4 } from 'uuid';
 import styled from 'styled-components';
 import { leaderboard } from '../logic/data';
 
@@ -111,7 +112,7 @@ const createModalTable = () => {
 				<tbody>
 					{leaderboard.points.map((point, index) => {
 						return (
-							<tr key={index}>
+							<tr key={v4()}>
 								<td>{index + 1}</td>
 								<td>{point[0]}</td>
 								<td>{point[1]}</td>
@@ -122,14 +123,14 @@ const createModalTable = () => {
 					})}
 					<tr className='status total'>
 						<td>TOTAL</td>
-						{leaderboard.total.map((point, index) => {
-							return <td key={index}>{point}</td>;
+						{leaderboard.total.map(point => {
+							return <td key={v4()}>{point}</td>;
 						})}
 					</tr>
 					<tr className='status ranks'>
 						<td>RANKS</td>
-						{leaderboard.ranks.map((rank, index) => {
-							return <td key={index}>{rank}</td>;
+						{leaderboard.ranks.map(rank => {
+							return <td key={v4()}>{rank}</td>;
 						})}
 					</tr>
 				</tbody>

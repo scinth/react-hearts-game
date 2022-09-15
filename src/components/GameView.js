@@ -70,7 +70,8 @@ function GameView() {
 		} else if (selectedCards.length < selectionLimit) {
 			store.dispatch(addCard(cardIndex));
 		} else if (selectedCards.length == selectionLimit) {
-			console.log('Card selection complete');
+			store.dispatch(removeCard(selectedCards[0]));
+			store.dispatch(addCard(cardIndex));
 		}
 	};
 

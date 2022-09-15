@@ -17,6 +17,7 @@ const Nav = styled.nav`
 	justify-content: space-between;
 	align-items: center;
 	flex-grow: 0;
+	box-shadow: 0 0.1em 0.25em 0.0005em rgb(0 0 0 / 30%);
 
 	> * {
 		margin: 0 1.5em;
