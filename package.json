@@ -1,6 +1,6 @@
 {
 	"name": "react-hearts-game",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Hearts card-game made with react",
 	"main": "src/index.js",
 	"scripts": {

@@ -8,6 +8,24 @@ import { setStatus } from '../features/Game/gameSlice';
 import store from '../App/store';
 import { getDeck } from './requests';
 
+const getDeckId = () => {
+	let pair = document.cookie.split('; ').find(pair => {
+		return pair.includes('deck_id');
+	});
+	if (pair) return pair.split('=')[1];
+	return null;
+};
+
+export const setDeckId = (id = null) => {
+	const numOfWeeks = 2;
+	const date = new Date();
+	date.setDate(date.getDate() + numOfWeeks * 7);
+	const expiry = date.toISOString();
+	let deck_id = id === null ? DECK_ID : id;
+	let cookie = `deck_id=${deck_id};expires=${expiry};domain=nielbrioneshearts.netlify.app;Secure`;
+	document.cookie = cookie;
+};
+
 // players
 export const PLAYERS = (function () {
 	let names = ['North', 'East', 'South', 'West'];
@@ -17,7 +35,8 @@ export const PLAYERS = (function () {
 	return players;
 })();
 
-export let DECK_ID = localStorage.getItem('DECK_ID');
+// export let DECK_ID = localStorage.getItem('DECK_ID');
+export let DECK_ID = getDeckId();
 export let GAME = null;
 export let leadPlayerIndex = null;
 export let IS_HEARTS_BROKEN = false;
@@ -92,6 +111,7 @@ export const getInitDeck = () => {
 			return;
 		}
 		DECK_ID = json.deck_id;
-		localStorage.setItem('DECK_ID', DECK_ID);
+		// localStorage.setItem('DECK_ID', DECK_ID);
+		setDeckId(DECK_ID);
 	});
 };
