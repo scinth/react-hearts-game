@@ -132,7 +132,7 @@ export const startGame = function* () {
 		leaderboard.update(handPoints);
 		leaderboard.display();
 
-		isGameOver = PLAYERS.some(player => player.points >= 10);
+		isGameOver = PLAYERS.some(player => player.points >= 100);
 
 		yield store.dispatch(showModal({ type: 'Rankings', paused: true }));
 	} while (!isGameOver);

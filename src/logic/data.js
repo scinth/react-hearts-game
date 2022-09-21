@@ -17,12 +17,9 @@ const getDeckId = () => {
 };
 
 export const setDeckId = (id = null) => {
-	const numOfWeeks = 2;
-	const date = new Date();
-	date.setDate(date.getDate() + numOfWeeks * 7);
-	const expiry = date.toISOString();
+	let maxAge = 60 * 60 * 24 * 14;
 	let deck_id = id === null ? DECK_ID : id;
-	let cookie = `deck_id=${deck_id};expires=${expiry};domain=nielbrioneshearts.netlify.app;Secure`;
+	let cookie = `deck_id=${deck_id};max-age=${maxAge};Secure`;
 	document.cookie = cookie;
 };
 
@@ -35,7 +32,6 @@ export const PLAYERS = (function () {
 	return players;
 })();
 
-// export let DECK_ID = localStorage.getItem('DECK_ID');
 export let DECK_ID = getDeckId();
 export let GAME = null;
 export let leadPlayerIndex = null;
@@ -103,7 +99,10 @@ export const getPileCards = (cb = null) => {
 };
 
 export const getInitDeck = () => {
-	if (DECK_ID !== null) return;
+	if (DECK_ID !== null) {
+		setDeckId();
+		return;
+	}
 	let promise = getDeck();
 	promise.then(json => {
 		if (!json.success) {
@@ -111,7 +110,6 @@ export const getInitDeck = () => {
 			return;
 		}
 		DECK_ID = json.deck_id;
-		// localStorage.setItem('DECK_ID', DECK_ID);
 		setDeckId(DECK_ID);
 	});
 };

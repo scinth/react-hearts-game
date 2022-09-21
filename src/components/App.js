@@ -3,7 +3,7 @@ import store from '../App/store';
 import Navigation from './Navigation';
 import GameView from './GameView';
 import HomePage from './HomePage';
-import { getInitDeck, setDeckId } from '../logic/data';
+import { getInitDeck } from '../logic/data';
 import { play } from '../logic/index';
 import { setLimit, setHandCounter, setGameOver } from '../features/Game/gameSlice';
 import { returnAllCardsToDeck } from '../logic/requests';
@@ -28,9 +28,6 @@ function App() {
 
 	useEffect(() => {
 		getInitDeck();
-		return () => {
-			setDeckId();
-		};
 	}, []);
 
 	return (
