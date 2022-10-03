@@ -66,4 +66,4 @@ function Tricks({ cards, sequence, playTrick, clickable }) {
 	);
 }
 
-export default Tricks;
+export default React.memo(Tricks);

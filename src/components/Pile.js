@@ -28,4 +28,4 @@ function Pile({ player, cards, selected, selectCard }) {
 	);
 }
 
-export default Pile;
+export default React.memo(Pile);

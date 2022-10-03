@@ -7,39 +7,43 @@ import { DECK_ID, GAME, getPileCards, PLAYERS } from '../logic/data';
 import store from '../App/store';
 import { setHandCounter, setLimit, setStatus } from '../features/Game/gameSlice';
 
+const DEFAULT_OPTIONS = {
+	headers: { 'Content-Type': 'application/json' },
+};
+
 const getNewDeck = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/new/?deck_count=1`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const shuffleDeck = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/shuffle`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const drawAllCardsFromDeck = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/draw/?count=52`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const addCardsToPile = (cardCodes, pileName) => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/${pileName}/add/?cards=${cardCodes}`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const addCardToTrick = cardCode => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/Trick/add/?cards=${cardCode}`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const returnAllCardsFromTrick = () => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/Trick/return`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 const returnAllCardsFromPile = pileName => {
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/${pileName}/return`;
-	return fetch(endpoint);
+	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
 
 //////////////////////////

@@ -1,14 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Trick from './Tricks';
 import Pile from './Pile';
-import LoaderHandler from './LoaderHandler';
 import Pass3Cards from './Pass3Cards';
 import { getPlaySequence } from '../logic';
 import { leadPlayerIndex, me } from '../logic/data';
 import store from '../App/store';
-import Notifier from './Notifier';
 import {
 	addCard,
 	removeCard,
@@ -16,6 +14,11 @@ import {
 	setLimit,
 	setHandCounter,
 } from '../features/Game/gameSlice';
+
+const trickMode = () => {
+	store.dispatch(clearCards());
+	store.dispatch(setLimit(1));
+};
 
 const getCardIndex = (cards, card) => {
 	let index = cards.findIndex(_card_ => {
@@ -49,7 +52,7 @@ const View = styled.div`
 	}
 `;
 
-function GameView() {
+function GameView({ children }) {
 	const selectedCards = useSelector(state => state.game.selectedCards);
 	const selectionLimit = useSelector(state => state.game.selectionLimit);
 	const handCounter = useSelector(state => state.game.handCounter);
@@ -59,33 +62,34 @@ function GameView() {
 	const westCards = useSelector(state => state.west.cards);
 	const trickCards = useSelector(state => state.trick.cards);
 
-	const selectCard = cardImage => {
-		let card = southCards.find(card => {
-			return card.code === cardImage.dataset.code;
-		});
-		let cardIndex = getCardIndex(southCards, card);
-		let hasSelected = selectedCards.some(index => index == cardIndex);
-		if (hasSelected) {
-			store.dispatch(removeCard(cardIndex));
-		} else if (selectedCards.length < selectionLimit) {
-			store.dispatch(addCard(cardIndex));
-		} else if (selectedCards.length == selectionLimit) {
-			store.dispatch(removeCard(selectedCards[0]));
-			store.dispatch(addCard(cardIndex));
-		}
-	};
+	const selectCard = useCallback(
+		cardImage => {
+			let card = southCards.find(card => {
+				return card.code === cardImage.dataset.code;
+			});
+			let cardIndex = getCardIndex(southCards, card);
+			let hasSelected = selectedCards.some(index => index == cardIndex);
+			if (hasSelected) {
+				store.dispatch(removeCard(cardIndex));
+			} else if (selectedCards.length < selectionLimit) {
+				store.dispatch(addCard(cardIndex));
+			} else if (selectedCards.length == selectionLimit) {
+				store.dispatch(removeCard(selectedCards[0]));
+				store.dispatch(addCard(cardIndex));
+			}
+		},
+		[southCards, selectedCards, selectionLimit],
+	);
 
-	const trickMode = () => {
-		store.dispatch(clearCards());
-		store.dispatch(setLimit(1));
-	};
-
-	const play = e => {
-		if (selectedCards.length == 0) return;
-		let card = southCards[selectedCards[0]];
-		me.selectCard(card.code);
-		e.stopPropagation();
-	};
+	const play = useCallback(
+		e => {
+			if (selectedCards.length == 0) return;
+			let card = southCards[selectedCards[0]];
+			me.selectCard(card.code);
+			e.stopPropagation();
+		},
+		[selectedCards, southCards],
+	);
 
 	useEffect(() => {
 		if (
@@ -135,8 +139,7 @@ function GameView() {
 					/>
 				)}
 			</View>
-			<Notifier />
-			<LoaderHandler />
+			{[...children]}
 		</>
 	);
 }

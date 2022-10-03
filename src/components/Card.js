@@ -48,4 +48,4 @@ function Card(props) {
 	return card;
 }
 
-export default Card;
+export default React.memo(Card);
