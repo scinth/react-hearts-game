@@ -1,13 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import logo from '../assets/nielbrioneshearts_logo.png';
-import { returnTrickCards } from '../logic/requests';
-import { play } from '../logic';
 import Modal from './Modal';
-import { GAME } from '../logic/data';
-import { useSelector } from 'react-redux';
 import store from '../App/store';
-import { closeModal, showModal } from '../features/Modal/modalSlice';
+import { showModal } from '../features/Modal/modalSlice';
 
 const Nav = styled.nav`
 	width: 100%;
@@ -114,16 +110,7 @@ const Nav = styled.nav`
 	}
 `;
 
-const restart = () => {
-	returnTrickCards(play);
-};
-
 function Navigation({ isGameReady, quitGame }) {
-	const { open, type, paused } = useSelector(state => state.modal);
-	const close = () => {
-		if (paused) GAME.next();
-		store.dispatch(closeModal());
-	};
 	return (
 		<>
 			<Nav>
@@ -167,24 +154,7 @@ function Navigation({ isGameReady, quitGame }) {
 					</li>
 				</ul>
 			</Nav>
-			{open && (
-				<Modal
-					type={{
-						name: type,
-						action: (() => {
-							switch (type) {
-								case 'Restart':
-									return restart;
-								case 'Quit':
-									return quitGame;
-								default:
-									return undefined;
-							}
-						})(),
-					}}
-					close={close}
-				/>
-			)}
+			<Modal quitGame={quitGame} />
 		</>
 	);
 }

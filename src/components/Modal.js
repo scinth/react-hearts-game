@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import store from '../App/store';
+import { useSelector } from 'react-redux';
+import { closeModal } from '../features/Modal/modalSlice';
 import { v4 } from 'uuid';
 import styled from 'styled-components';
-import { leaderboard } from '../logic/data';
+import { GAME, leaderboard, networkErrorHandler } from '../logic/data';
+import { returnTrickCards } from '../logic/requests';
+import { play } from '../logic';
 
 const ModalContainer = styled.div`
 	display: flex;
@@ -139,42 +144,79 @@ const createModalTable = () => {
 	);
 };
 
-function Modal({ type, close }) {
-	return ReactDom.createPortal(
-		<ModalContainer
-			onClick={e => {
-				if (e.target === e.currentTarget) close();
-			}}
-		>
-			<ModalCard>
-				{type.name == 'Rankings' && createModalTable()}
-				{(type.name == 'Restart' || type.name == 'Quit') && (
-					<>
-						<h1>{`${type.name} Game`}</h1>
-						<p>
-							{`Are you sure to ${type.name.toLowerCase()} the game?`}
-							<br />
-							All your progress will be lost.
-						</p>
-					</>
-				)}
-				<div className='buttons'>
-					{type.action && (
-						<button
-							onClick={() => {
-								close();
-								type.action();
-							}}
-						>
-							YES
-						</button>
-					)}
-					<button onClick={close}>{type.name == 'Rankings' ? 'OK' : 'NO'}</button>
-				</div>
-			</ModalCard>
-		</ModalContainer>,
-		document.getElementById('modal-root'),
-	);
+const restart = () => {
+	returnTrickCards(play);
+};
+
+function Modal({ quitGame }) {
+	const { open, type, paused } = useSelector(state => state.modal);
+	const close = () => {
+		if (paused) GAME.next();
+		store.dispatch(closeModal());
+	};
+	const action = (() => {
+		switch (type) {
+			case 'Restart':
+				return restart;
+			case 'Quit':
+				return quitGame;
+			default:
+				return undefined;
+		}
+	})();
+	const JSX = open
+		? ReactDom.createPortal(
+				<ModalContainer
+					onClick={e => {
+						if (type != 'NetworkError' && e.target === e.currentTarget) close();
+					}}
+				>
+					<ModalCard>
+						{type == 'Rankings' && createModalTable()}
+						{(type == 'Restart' || type == 'Quit') && (
+							<>
+								<h1>{`${type} Game`}</h1>
+								<p>
+									{`Are you sure to ${type.toLowerCase()} the game?`}
+									<br />
+									All your progress will be lost.
+								</p>
+							</>
+						)}
+						{type == 'NetworkError' && (
+							<>
+								<h1>Network Error</h1>
+								<p>Slow network, please check your connection.</p>
+							</>
+						)}
+						<div className='buttons'>
+							{action && (
+								<button
+									onClick={() => {
+										close();
+										action();
+									}}
+								>
+									YES
+								</button>
+							)}
+							<button
+								onClick={() => {
+									close();
+									if (type == 'NetworkError') {
+										networkErrorHandler.resolve(true);
+									}
+								}}
+							>
+								{type == 'Rankings' ? 'OK' : type == 'NetworkError' ? 'Retry' : 'NO'}
+							</button>
+						</div>
+					</ModalCard>
+				</ModalContainer>,
+				document.getElementById('modal-root'),
+		  )
+		: null;
+	return JSX;
 }
 
 export default Modal;

@@ -7,6 +7,7 @@ import { fetchTrick } from '../features/Trick/tricksSlice';
 import { setStatus } from '../features/Game/gameSlice';
 import store from '../App/store';
 import { getDeck } from './requests';
+import { showModal } from '../features/Modal/modalSlice';
 
 const getDeckId = () => {
 	let pair = document.cookie.split('; ').find(pair => {
@@ -14,6 +15,15 @@ const getDeckId = () => {
 	});
 	if (pair) return pair.split('=')[1];
 	return null;
+};
+
+const createPromise = () => {
+	let res = null;
+	let prom = new Promise(resolve => {
+		res = resolve;
+	});
+	console.log('Promise created');
+	return [prom, res];
 };
 
 export const setDeckId = (id = null) => {
@@ -38,6 +48,17 @@ export let leadPlayerIndex = null;
 export let IS_HEARTS_BROKEN = false;
 export let me = PLAYERS[2];
 export let leaderboard;
+
+export const networkErrorHandler = {
+	resolve: () => {},
+	openRetryModal: function () {
+		const [prom, res] = createPromise();
+		this.resolve = res;
+		store.dispatch(showModal({ type: 'NetworkError', paused: false }));
+		return prom;
+	},
+};
+
 export const set_Leaderboard = value => {
 	leaderboard = value;
 };

@@ -3,7 +3,7 @@ import { fetchNorth } from '../features/North/northSlice';
 import { fetchSouth } from '../features/South/southSlice';
 import { fetchTrick } from '../features/Trick/tricksSlice';
 import { fetchWest } from '../features/West/westSlice';
-import { DECK_ID, GAME, getPileCards, PLAYERS } from '../logic/data';
+import { DECK_ID, GAME, getPileCards, PLAYERS, networkErrorHandler } from '../logic/data';
 import store from '../App/store';
 import { setHandCounter, setLimit, setStatus } from '../features/Game/gameSlice';
 
@@ -37,6 +37,18 @@ const addCardToTrick = cardCode => {
 };
 
 const returnAllCardsFromTrick = () => {
+	let cards = store.getState().trick.cards;
+	if (cards.length <= 0) {
+		return new Promise(resolve => {
+			resolve({
+				ok: true,
+				json: () =>
+					new Promise(res => {
+						res({ success: true, json: 'fullfilled' });
+					}),
+			});
+		});
+	}
 	let endpoint = `https://deckofcardsapi.com/api/deck/${DECK_ID}/pile/Trick/return`;
 	return fetch(endpoint, { ...DEFAULT_OPTIONS });
 };
@@ -48,160 +60,191 @@ const returnAllCardsFromPile = pileName => {
 
 //////////////////////////
 
-export const getDeck = async () => {
-	try {
-		store.dispatch(setStatus(0));
-		let response = await getNewDeck();
+const makeRequest = (requestCallback, args) => {
+	let resolve = null;
+	const requestHandler = new Promise(res => {
+		resolve = res;
+	});
+	requestCallback(...args)
+		.then(response => {
+			if (response.ok) return response.json();
+			else {
+				resolve({ ok: false });
+				console.error('HTTP error:', response.status);
+			}
+		})
+		.then(json => {
+			if (json.success) resolve({ ok: true, json });
+			else {
+				resolve({ ok: false });
+				console.error('DeckOfCardsAPI error');
+			}
+		})
+		.catch(reason => {
+			resolve({ ok: false });
+			console.error(reason);
+		});
+	return requestHandler;
+};
+
+const tryRequest = async (requestCallback, args = [], status = null) => {
+	let response = { ok: false };
+	let retry = false;
+	do {
+		retry = false;
+		if (status !== null) store.dispatch(setStatus(status));
+		response = await makeRequest(requestCallback, args);
 		if (!response.ok) {
-			throw new Error(`HTTP error: ${response.status}`);
+			store.dispatch(setStatus(4));
+			retry = await networkErrorHandler.openRetryModal();
 		}
-		const json = await response.json();
-		return json;
-	} catch (error) {
-		console.log('getDeck failed', error);
-	}
+	} while (!response.ok && retry);
+	return response.json;
+};
+
+export const getDeck = async () => {
+	return await tryRequest(getNewDeck);
 };
 
 export const segregateCards = async () => {
-	try {
-		let response, json;
-		store.dispatch(setStatus(1));
-		response = await shuffleDeck();
-		if (!response.ok) {
-			throw new Error(`HTTP error: ${response.status}`);
-		}
-		json = await response.json();
-		if (!json.success) {
-			throw new Error('shuffleDeck failed');
-		}
-		console.log('Deck shuffled');
-		store.dispatch(setStatus(2));
-		response = await drawAllCardsFromDeck();
-		if (!response.ok) {
-			throw new Error(`HTTP error: ${response.status}`);
-		}
-		json = await response.json();
-		if (!json.success) {
-			throw new Error('drawAllCardsFromDeck failed');
-		}
-		let cards = [...json.cards].map(card => card.code);
+	await tryRequest(shuffleDeck, [], 1);
+	console.log('Deck shuffled');
+	const json = await tryRequest(drawAllCardsFromDeck, [], 2);
+	const cards = json.cards.map(card => card.code);
 
-		// adding cards to pile
-		for (const player of PLAYERS) {
-			let name = player.name;
-			let cardCodes = cards.splice(0, 13).toString();
-			response = await addCardsToPile(cardCodes, name);
-			if (!response.ok) {
-				throw new Error(`HTTP error: ${response.status}`);
-			}
-			json = await response.json();
-			if (!json.success) {
-				throw new Error(`addCardsToPile(${name}) failed`);
-			}
-		}
-
-		console.log('Cards segregated');
-		getPileCards(() => {
-			GAME.next();
-		});
-	} catch (error) {
-		console.log('Fetch task "segregateCards" failed', error);
+	// adding cards to pile
+	for (const { name } of PLAYERS) {
+		const cardCodes = cards.splice(0, 13).toString();
+		await tryRequest(addCardsToPile, [cardCodes, name]);
 	}
+
+	console.log('Cards segregated');
+	getPileCards(() => {
+		GAME.next();
+	});
 };
 
 export const pass3Cards = async recipientCounter => {
-	try {
-		store.dispatch(setStatus(3));
-		for (let index = 0; index < 4; index++) {
-			let recipientIndex = index + recipientCounter;
-			while (recipientIndex >= 4) recipientIndex -= 4;
-			let player = PLAYERS[index];
-			let recipient = PLAYERS[recipientIndex];
-			let response = await addCardsToPile(player.cardsToPass.toString(), recipient.name);
-			if (!response.ok) {
-				throw new Error(`HTTP error on pass3Cards${index}: ${response.status}`);
-			}
-			player.cardsToPass = [];
-		}
-
-		getPileCards(() => {
-			GAME.next();
-		});
-	} catch (error) {
-		console.log('pass3cards failed', error);
+	for (let index = 0; index < 4; index++) {
+		let recipientIndex = index + recipientCounter;
+		if (recipientIndex >= 4) recipientIndex -= 4;
+		let player = PLAYERS[index];
+		let recipient = PLAYERS[recipientIndex];
+		let cardCodes = player.cardsToPass.toString();
+		await tryRequest(addCardsToPile, [cardCodes, recipient.name], 3);
+		player.cardsToPass = [];
 	}
+
+	getPileCards(() => {
+		GAME.next();
+	});
 };
 
 export const playTrick = async (playerName, cardCode) => {
-	try {
-		let response = await addCardToTrick(cardCode);
-		if (!response.ok) {
-			throw new Error(`HTTP error: ${response.status}`);
-		}
-		let json = await response.json();
-		if (!json.success) {
-			throw new Error(`addCardToTrick fails`);
-		}
+	await tryRequest(addCardToTrick, [cardCode]);
 
-		switch (playerName) {
-			case 'North':
-				store.dispatch(fetchNorth());
-				break;
-			case 'East':
-				store.dispatch(fetchEast());
-				break;
-			case 'South':
-				store.dispatch(fetchSouth());
-				break;
-			case 'West':
-				store.dispatch(fetchWest());
-		}
-		store.dispatch(fetchTrick(() => GAME.next()));
-	} catch (error) {
-		console.log('playTrick failed', error);
+	switch (playerName) {
+		case 'North':
+			store.dispatch(fetchNorth());
+			break;
+		case 'East':
+			store.dispatch(fetchEast());
+			break;
+		case 'South':
+			store.dispatch(fetchSouth());
+			break;
+		case 'West':
+			store.dispatch(fetchWest());
 	}
+	store.dispatch(fetchTrick(() => GAME.next()));
 };
 
 export const returnTrickCards = async (cb = null) => {
-	try {
-		let response = await returnAllCardsFromTrick();
-		if (!response.ok) {
-			throw new Error(`HTTP error: ${response.status}`);
-		}
-		let json = await response.json();
-		if (!json.success) {
-			throw new Error(`returnAllCardsFromTrick failed`);
-		}
-		if (typeof cb == 'function') {
-			// reset game
-			store.dispatch(setLimit(3));
-			store.dispatch(setHandCounter(1));
-			cb();
-			console.clear();
-		} else
-			store.dispatch(
-				fetchTrick(() => {
-					GAME.next();
-				}),
-			);
-	} catch (error) {
-		console.log('returnTrickCards failed', error);
-	}
+	await tryRequest(returnAllCardsFromTrick);
+	if (typeof cb == 'function') {
+		// reset game
+		store.dispatch(setLimit(3));
+		store.dispatch(setHandCounter(1));
+		cb();
+		console.clear();
+	} else
+		store.dispatch(
+			fetchTrick(() => {
+				GAME.next();
+			}),
+		);
 };
 
-export const returnAllCardsToDeck = () => {
-	let requests = [];
-	PLAYERS.forEach(player => {
-		requests.push(returnAllCardsFromPile(player.name));
+class Request {
+	constructor(callback, args = []) {
+		this.promise = null;
+		this.callback = callback;
+		this.args = args;
+		this.ok = false;
+	}
+	try() {
+		if (this.ok) return;
+		let promise = this.callback(...this.args);
+		promise.then(response => {
+			this.ok = response.ok;
+		});
+		this.promise = promise;
+	}
+}
+
+const makeMultipleRequests = requests => {
+	let resolve = null;
+	const requestHandler = new Promise(res => {
+		resolve = res;
 	});
-	requests.push(returnAllCardsFromTrick());
-	Promise.all(requests).then(responses => {
-		if (responses.every(response => response.ok)) {
-			store.dispatch(fetchNorth());
-			store.dispatch(fetchEast());
-			store.dispatch(fetchSouth());
-			store.dispatch(fetchWest());
-			store.dispatch(fetchTrick());
+	Promise.all(requests)
+		.then(responses => {
+			if (responses.every(response => response.ok)) {
+				resolve({ ok: true });
+			} else {
+				resolve({ ok: false });
+				console.error('then error: HTTP error');
+			}
+		})
+		.catch(reason => {
+			resolve({ ok: false });
+			console.error('catch error:', reason);
+		});
+	return requestHandler;
+};
+
+const tryMultipleRequests = async callback => {
+	let response = { ok: false };
+	let retry = false;
+	do {
+		retry = false;
+		response = await makeMultipleRequests(callback());
+		if (!response.ok) {
+			store.dispatch(setStatus(4));
+			retry = await networkErrorHandler.openRetryModal();
 		}
-	});
+	} while (!response.ok && retry);
+};
+
+export const returnAllCardsToDeck = async () => {
+	let requests = [];
+	for (const { name } of PLAYERS) {
+		requests.push(new Request(returnAllCardsFromPile, [name]));
+	}
+	requests.push(new Request(returnAllCardsFromTrick));
+	const getAllUnresolvedRequests = () => {
+		let unresolved = requests
+			.filter(request => {
+				request.try();
+				return !request.ok;
+			})
+			.map(request => request.promise);
+		return unresolved;
+	};
+	await tryMultipleRequests(getAllUnresolvedRequests);
+	store.dispatch(fetchNorth());
+	store.dispatch(fetchEast());
+	store.dispatch(fetchSouth());
+	store.dispatch(fetchWest());
+	store.dispatch(fetchTrick());
 };
